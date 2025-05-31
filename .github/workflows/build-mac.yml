@@ -7,7 +7,7 @@ on:
 
 jobs:
   Build-Console:
-    runs-on: macos-10.15
+    runs-on: macos-13
     steps:
       - name: Extract tag name
         id: tag
@@ -50,7 +50,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   Build-Client:
-    runs-on: macos-10.15
+    runs-on: macos-13
     steps:
       - name: Extract tag name
         id: tag
