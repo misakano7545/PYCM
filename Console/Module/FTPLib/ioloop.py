@@ -56,8 +56,7 @@ server = Server('localhost', 8021)
 IOLoop.instance().loop()
 """
 
-import asynchat
-import asyncore
+import asyncio
 import errno
 import heapq
 import os
@@ -79,8 +78,6 @@ from .log import logger
 
 
 timer = getattr(time, 'monotonic', time.time)
-_read = asyncore.read
-_write = asyncore.write
 
 # These errnos indicate that a connection has been abruptly terminated.
 _ERRNOS_DISCONNECTED = set((
@@ -248,13 +245,32 @@ class _CallLater(object):
 class _CallEvery(_CallLater):
     """Container object which instance is returned by IOLoop.call_every()."""
 
+    __slots__ = ('_delay', '_target', '_args', '_kwargs', '_errback', '_sched',
+                 '_repush', 'timeout', 'cancelled')
+
+    def __init__(self, seconds, target, *args, **kwargs):
+        assert callable(target), "%s is not callable" % target
+        assert sys.maxsize >= seconds >= 0, \
+            "%s is not greater than or equal to 0 seconds" % seconds
+        self._delay = seconds
+        self._target = target
+        self._args = args
+        self._kwargs = kwargs
+        self._errback = kwargs.pop('_errback', None)
+        self._sched = kwargs.pop('_scheduler')
+        self._repush = False
+        # seconds from the epoch at which to call the function
+        if not seconds:
+            self.timeout = 0
+        else:
+            self.timeout = timer() + self._delay
+        self.cancelled = False
+        self._sched.register(self)
+
     def _post_call(self, exc):
         if not self.cancelled:
-            if exc:
-                self.cancel()
-            else:
-                self.timeout = timer() + self._delay
-                self._sched.register(self)
+            self.timeout = timer() + self._delay
+            self._repush = True
 
 
 class _IOLoop(object):
@@ -269,6 +285,7 @@ class _IOLoop(object):
     def __init__(self):
         self.socket_map = {}
         self.sched = _Scheduler()
+        self.loop = asyncio.get_event_loop()
 
     def __enter__(self):
         return self
@@ -286,7 +303,6 @@ class _IOLoop(object):
 
     @classmethod
     def instance(cls):
-        """Return a global IOLoop instance."""
         if cls._instance is None:
             with cls._lock:
                 if cls._instance is None:
@@ -294,112 +310,36 @@ class _IOLoop(object):
         return cls._instance
 
     def register(self, fd, instance, events):
-        """Register a fd, handled by instance for the given events."""
-        raise NotImplementedError('must be implemented in subclass')
+        self.socket_map[fd] = instance
 
     def unregister(self, fd):
-        """Register fd."""
-        raise NotImplementedError('must be implemented in subclass')
+        if fd in self.socket_map:
+            del self.socket_map[fd]
 
     def modify(self, fd, events):
-        """Changes the events assigned for fd."""
-        raise NotImplementedError('must be implemented in subclass')
+        pass
 
     def poll(self, timeout):
-        """Poll once.  The subclass overriding this method is supposed
-        to poll over the registered handlers and the scheduled functions
-        and then return.
-        """
-        raise NotImplementedError('must be implemented in subclass')
+        self.loop.run_until_complete(asyncio.sleep(timeout))
 
     def loop(self, timeout=None, blocking=True):
-        """Start the asynchronous IO loop.
-
-         - (float) timeout: the timeout passed to the underlying
-           multiplex syscall (select(), epoll() etc.).
-
-         - (bool) blocking: if True poll repeatedly, as long as there
-           are registered handlers and/or scheduled functions.
-           If False poll only once and return the timeout of the next
-           scheduled call (if any, else None).
-        """
-        if not _IOLoop._started_once:
-            _IOLoop._started_once = True
-            if not is_logging_configured():
-                # If we get to this point it means the user hasn't
-                # configured logging. We want to log by default so
-                # we configure logging ourselves so that it will
-                # print to stderr.
-                config_logging()
-
-        if blocking:
-            # localize variable access to minimize overhead
-            poll = self.poll
-            socket_map = self.socket_map
-            sched_poll = self.sched.poll
-
-            if timeout is not None:
-                while socket_map:
-                    poll(timeout)
-                    sched_poll()
-            else:
-                soonest_timeout = None
-                while socket_map:
-                    poll(soonest_timeout)
-                    soonest_timeout = sched_poll()
-        else:
-            sched = self.sched
-            if self.socket_map:
-                self.poll(timeout)
-            if sched._tasks:
-                return sched.poll()
+        if not self._started_once:
+            self._started_once = True
+        try:
+            self.loop.run_forever()
+        except KeyboardInterrupt:
+            pass
+        finally:
+            self.close()
 
     def call_later(self, seconds, target, *args, **kwargs):
-        """Calls a function at a later time.
-        It can be used to asynchronously schedule a call within the polling
-        loop without blocking it. The instance returned is an object that
-        can be used to cancel or reschedule the call.
-
-         - (int) seconds: the number of seconds to wait
-         - (obj) target: the callable object to call later
-         - args: the arguments to call it with
-         - kwargs: the keyword arguments to call it with; a special
-           '_errback' parameter can be passed: it is a callable
-           called in case target function raises an exception.
-       """
-        kwargs['_scheduler'] = self.sched
-        return _CallLater(seconds, target, *args, **kwargs)
+        return self.loop.call_later(seconds, target, *args, **kwargs)
 
     def call_every(self, seconds, target, *args, **kwargs):
-        """Schedules the given callback to be called periodically."""
-        kwargs['_scheduler'] = self.sched
-        return _CallEvery(seconds, target, *args, **kwargs)
+        return self.loop.call_every(seconds, target, *args, **kwargs)
 
     def close(self):
-        """Closes the IOLoop, freeing any resources used."""
-        debug("closing IOLoop", self)
-        self.__class__._instance = None
-
-        # free connections
-        instances = sorted(self.socket_map.values(), key=lambda x: x._fileno)
-        for inst in instances:
-            try:
-                inst.close()
-            except OSError as err:
-                if err.errno != errno.EBADF:
-                    logger.error(traceback.format_exc())
-            except Exception:
-                logger.error(traceback.format_exc())
-        self.socket_map.clear()
-
-        # free scheduled functions
-        for x in self.sched._tasks:
-            try:
-                if not x.cancelled:
-                    x.cancel()
-            except Exception:
-                logger.error(traceback.format_exc())
-        del self.sched._tasks[:]
+        self.loop.close()
 
 
 # ===================================================================
@@ -407,59 +347,23 @@ class _IOLoop(object):
 # ===================================================================
 
 class Select(_IOLoop):
-    """select()-based poller."""
+    """select() based poller."""
 
     def __init__(self):
         _IOLoop.__init__(self)
-        self._r = []
-        self._w = []
 
     def register(self, fd, instance, events):
-        if fd not in self.socket_map:
-            self.socket_map[fd] = instance
-            if events & self.READ:
-                self._r.append(fd)
-            if events & self.WRITE:
-                self._w.append(fd)
+        self.socket_map[fd] = instance
 
     def unregister(self, fd):
-        try:
+        if fd in self.socket_map:
             del self.socket_map[fd]
-        except KeyError:
-            debug("call: unregister(); fd was no longer in socket_map", self)
-        for l in (self._r, self._w):
-            try:
-                l.remove(fd)
-            except ValueError:
-                pass
 
     def modify(self, fd, events):
-        inst = self.socket_map.get(fd)
-        if inst is not None:
-            self.unregister(fd)
-            self.register(fd, inst, events)
-        else:
-            debug("call: modify(); fd was no longer in socket_map", self)
+        pass
 
     def poll(self, timeout):
-        try:
-            r, w, e = select.select(self._r, self._w, [], timeout)
-        except select.error as err:
-            if getattr(err, "errno", None) == errno.EINTR:
-                return
-            raise
-
-        smap_get = self.socket_map.get
-        for fd in r:
-            obj = smap_get(fd)
-            if obj is None or not obj.readable():
-                continue
-            _read(obj)
-        for fd in w:
-            obj = smap_get(fd)
-            if obj is None or not obj.writable():
-                continue
-            _write(obj)
+        self.loop.run_until_complete(asyncio.sleep(timeout))
 
 
 # ===================================================================
@@ -467,76 +371,23 @@ class Select(_IOLoop):
 # ===================================================================
 
 class _BasePollEpoll(_IOLoop):
-    """This is common to both poll() (UNIX), epoll() (Linux) and
-    /dev/poll (Solaris) implementations which share almost the same
-    interface.
-    Not supposed to be used directly.
-    """
+    """Base class for poll() and epoll() based pollers."""
 
     def __init__(self):
         _IOLoop.__init__(self)
-        self._poller = self._poller()
 
     def register(self, fd, instance, events):
-        try:
-            self._poller.register(fd, events)
-        except EnvironmentError as err:
-            if err.errno == errno.EEXIST:
-                debug("call: register(); poller raised EEXIST; ignored", self)
-            else:
-                raise
         self.socket_map[fd] = instance
 
     def unregister(self, fd):
-        try:
+        if fd in self.socket_map:
             del self.socket_map[fd]
-        except KeyError:
-            debug("call: unregister(); fd was no longer in socket_map", self)
-        else:
-            try:
-                self._poller.unregister(fd)
-            except EnvironmentError as err:
-                if err.errno in (errno.ENOENT, errno.EBADF):
-                    debug("call: unregister(); poller returned %r; "
-                          "ignoring it" % err, self)
-                else:
-                    raise
 
     def modify(self, fd, events):
-        try:
-            self._poller.modify(fd, events)
-        except OSError as err:
-            if err.errno == errno.ENOENT and fd in self.socket_map:
-                # XXX - see:
-                # https://github.com/giampaolo/pyftpdlib/issues/329
-                instance = self.socket_map[fd]
-                self.register(fd, instance, events)
-            else:
-                raise
+        pass
 
     def poll(self, timeout):
-        try:
-            events = self._poller.poll(timeout or -1)  # -1 waits indefinitely
-        except (IOError, select.error) as err:
-            # for epoll() and poll() respectively
-            if err.errno == errno.EINTR:
-                return
-            raise
-        # localize variable access to minimize overhead
-        smap_get = self.socket_map.get
-        for fd, event in events:
-            inst = smap_get(fd)
-            if inst is None:
-                continue
-            if event & self._ERROR and not event & self.READ:
-                inst.handle_close()
-            else:
-                if event & self.READ:
-                    if inst.readable():
-                        _read(inst)
-                if event & self.WRITE:
-                    if inst.writable():
-                        _write(inst)
+        self.loop.run_until_complete(asyncio.sleep(timeout))
 
 
 # ===================================================================
@@ -553,16 +404,14 @@ if hasattr(select, 'poll'):
         _ERROR = select.POLLERR | select.POLLHUP | select.POLLNVAL
         _poller = select.poll
 
+        def __init__(self):
+            _BasePollEpoll.__init__(self)
+
         def modify(self, fd, events):
-            inst = self.socket_map[fd]
-            self.unregister(fd)
-            self.register(fd, inst, events)
+            pass
 
         def poll(self, timeout):
-            # poll() timeout is expressed in milliseconds
-            if timeout is not None:
-                timeout = int(timeout * 1000)
-            _BasePollEpoll.poll(self, timeout)
+            self.loop.run_until_complete(asyncio.sleep(timeout))
 
 
 # ===================================================================
@@ -579,28 +428,20 @@ if hasattr(select, 'devpoll'):  # pragma: no cover
         _ERROR = select.POLLERR | select.POLLHUP | select.POLLNVAL
         _poller = select.devpoll
 
-        # introduced in python 3.4
-        if hasattr(select.devpoll, 'fileno'):
-            def fileno(self):
-                """Return devpoll() fd."""
-                return self._poller.fileno()
+        def __init__(self):
+            _BasePollEpoll.__init__(self)
+
+        def fileno(self):
+            return self._poller.fileno()
 
         def modify(self, fd, events):
-            inst = self.socket_map[fd]
-            self.unregister(fd)
-            self.register(fd, inst, events)
+            pass
 
         def poll(self, timeout):
-            # /dev/poll timeout is expressed in milliseconds
-            if timeout is not None:
-                timeout = int(timeout * 1000)
-            _BasePollEpoll.poll(self, timeout)
+            self.loop.run_until_complete(asyncio.sleep(timeout))
 
-        # introduced in python 3.4
-        if hasattr(select.devpoll, 'close'):
-            def close(self):
-                _IOLoop.close(self)
-                self._poller.close()
+        def close(self):
+            self.loop.close()
 
 
 # ===================================================================
@@ -617,13 +458,14 @@ if hasattr(select, 'epoll'):
         _ERROR = select.EPOLLERR | select.EPOLLHUP
         _poller = select.epoll
 
+        def __init__(self):
+            _BasePollEpoll.__init__(self)
+
         def fileno(self):
-            """Return epoll() fd."""
             return self._poller.fileno()
 
         def close(self):
-            _IOLoop.close(self)
-            self._poller.close()
+            self.loop.close()
 
 
 # ===================================================================
@@ -759,228 +601,189 @@ else:                             # select() - POSIX and Windows
 # file descriptors against the new pollers
 
 
-class AsyncChat(asynchat.async_chat):
-    """Same as asynchat.async_chat, only working with the new IO poller
-    and being more clever in avoid registering for read events when
-    it shouldn't.
-    """
+class AsyncChat(asyncio.Protocol):
+    """A class for handling asynchronous communication."""
 
     def __init__(self, sock=None, ioloop=None):
-        self.ioloop = ioloop or IOLoop.instance()
-        self._wanted_io_events = self.ioloop.READ
-        self._current_io_events = self.ioloop.READ
-        self._closed = False
+        self.sock = sock
+        self.ioloop = ioloop
+        self.transport = None
+        self.protocol = None
+        self._buffer = []
+        self._buffer_len = 0
+        self._terminator = b"\r\n"
+        self._wanted_io_events = 0
+        self._initialized = False
         self._closing = False
-        self._fileno = sock.fileno() if sock else None
-        self._tasks = []
-        asynchat.async_chat.__init__(self, sock)
+        self._closed = False
+        self.connected = True  # 兼容 asynchat/asyncore 旧逻辑
+        self._lastdata = 0
+        self._had_cr = False
+        self._start_time = timer()
+        self._resp = ()
+        self._offset = None
+        self._filefd = None
+        self._idler = None
+        self._initialized = False
+        try:
+            if sock is not None:
+                self.transport, self.protocol = self.ioloop.create_connection(
+                    lambda: self, sock=sock)
+        except socket.error as err:
+            # if we get an exception here we want the dispatcher
+            # instance to set socket attribute before closing, see:
+            # https://github.com/giampaolo/pyftpdlib/issues/188
+            self.transport, self.protocol = self.ioloop.create_connection(
+                lambda: self, sock=socket.socket())
+            # https://github.com/giampaolo/pyftpdlib/issues/143
+            self.close()
+            if err.errno == errno.EINVAL:
+                return
+            self.handle_error()
+            return
 
-    # --- IO loop related methods
+        # remove this instance from IOLoop's socket map
+        if not self.connected:
+            self.close()
+            return
+        if self.timeout:
+            self._idler = self.ioloop.call_every(self.timeout,
+                                                 self.handle_timeout,
+                                                 _errback=self.handle_error)
 
-    def add_channel(self, map=None, events=None):
-        assert self._fileno, repr(self._fileno)
-        events = events if events is not None else self.ioloop.READ
-        self.ioloop.register(self._fileno, self, events)
-        self._wanted_io_events = events
-        self._current_io_events = events
+    def connection_made(self, transport):
+        self.transport = transport
 
-    def del_channel(self, map=None):
-        if self._fileno is not None:
-            self.ioloop.unregister(self._fileno)
+    def data_received(self, data):
+        self._buffer.append(data)
+        self._buffer_len += len(data)
+        # Flush buffer if it gets too long (possible DoS attacks).
+        # RFC-959 specifies that a 500 response could be given in
+        # such cases
+        buflimit = 2048
+        if self._buffer_len > buflimit:
+            self.respond_w_warning('500 Command too long.')
+            self._buffer = []
+            self._buffer_len = 0
 
-    def modify_ioloop_events(self, events, logdebug=False):
-        if not self._closed:
-            assert self._fileno, repr(self._fileno)
-            if self._fileno not in self.ioloop.socket_map:
-                debug(
-                    "call: modify_ioloop_events(), fd was no longer in "
-                    "socket_map, had to register() it again", inst=self)
-                self.add_channel(events=events)
-            else:
-                if events != self._current_io_events:
-                    if logdebug:
-                        if events == self.ioloop.READ:
-                            ev = "R"
-                        elif events == self.ioloop.WRITE:
-                            ev = "W"
-                        elif events == self.ioloop.READ | self.ioloop.WRITE:
-                            ev = "RW"
-                        else:
-                            ev = events
-                        debug("call: IOLoop.modify(); setting %r IO events" % (
-                            ev), self)
-                    self.ioloop.modify(self._fileno, events)
-            self._current_io_events = events
-        else:
-            debug(
-                "call: modify_ioloop_events(), handler had already been "
-                "close()d, skipping modify()", inst=self)
+    def connection_lost(self, exc):
+        self.handle_close()
 
-    # --- utils
-
-    def call_later(self, seconds, target, *args, **kwargs):
-        """Same as self.ioloop.call_later but also cancel()s the
-        scheduled function on close().
-        """
-        if '_errback' not in kwargs and hasattr(self, 'handle_error'):
-            kwargs['_errback'] = self.handle_error
-        callback = self.ioloop.call_later(seconds, target, *args, **kwargs)
-        self._tasks.append(callback)
-        return callback
-
-    # --- overridden asynchat methods
-
-    def connect(self, addr):
+    def push(self, data):
+        self._initialized = True
         self.modify_ioloop_events(self.ioloop.WRITE)
-        asynchat.async_chat.connect(self, addr)
+        self._wanted_io_events = self.ioloop.WRITE
+        self.transport.write(data)
 
-    def connect_af_unspecified(self, addr, source_address=None):
-        """Same as connect() but guesses address family from addr.
-        Return the address family just determined.
-        """
-        assert self.socket is None
-        host, port = addr
-        err = "getaddrinfo() returned an empty list"
-        info = socket.getaddrinfo(host, port, socket.AF_UNSPEC,
-                                  socket.SOCK_STREAM, 0, socket.AI_PASSIVE)
-        for res in info:
-            self.socket = None
-            af, socktype, proto, canonname, sa = res
+    def push_with_producer(self, producer):
+        self._initialized = True
+        self.modify_ioloop_events(self.ioloop.WRITE)
+        self._wanted_io_events = self.ioloop.WRITE
+        if self.use_sendfile():
+            self._offset = producer.file.tell()
+            self._filefd = self.file_obj.fileno()
             try:
-                self.create_socket(af, socktype)
-                if source_address:
-                    if source_address[0].startswith('::ffff:'):
-                        # In this scenario, the server has an IPv6 socket, but
-                        # the remote client is using IPv4 and its address is
-                        # represented as an IPv4-mapped IPv6 address which
-                        # looks like this ::ffff:151.12.5.65, see:
-                        # http://en.wikipedia.org/wiki/IPv6\
-                        #     IPv4-mapped_addresses
-                        # http://tools.ietf.org/html/rfc3493.html#section-3.7
-                        # We truncate the first bytes to make it look like a
-                        # common IPv4 address.
-                        source_address = (source_address[0][7:],
-                                          source_address[1])
-                    self.bind(source_address)
-                self.connect((host, port))
-            except socket.error as _:
-                err = _
-                if self.socket is not None:
-                    self.socket.close()
-                    self.del_channel()
-                    self.socket = None
-                continue
-            break
-        if self.socket is None:
-            self.del_channel()
-            raise socket.error(err)
-        return af
-
-    # send() and recv() overridden as a fix around various bugs:
-    # - http://bugs.python.org/issue1736101
-    # - https://github.com/giampaolo/pyftpdlib/issues/104
-    # - https://github.com/giampaolo/pyftpdlib/issues/109
-
-    def send(self, data):
-        try:
-            return self.socket.send(data)
-        except socket.error as err:
-            debug("call: send(), err: %s" % err, inst=self)
-            if err.errno in _ERRNOS_RETRY:
-                return 0
-            elif err.errno in _ERRNOS_DISCONNECTED:
-                self.handle_close()
-                return 0
+                self.initiate_sendfile()
+            except _GiveUpOnSendfile:
+                pass
             else:
-                raise
-
-    def recv(self, buffer_size):
-        try:
-            data = self.socket.recv(buffer_size)
-        except socket.error as err:
-            debug("call: recv(), err: %s" % err, inst=self)
-            if err.errno in _ERRNOS_DISCONNECTED:
-                self.handle_close()
-                return b''
-            elif err.errno in _ERRNOS_RETRY:
-                raise RetryError
-            else:
-                raise
-        else:
-            if not data:
-                # a closed connection is indicated by signaling
-                # a read condition, and having recv() return 0.
-                self.handle_close()
-                return b''
-            else:
-                return data
-
-    def handle_read(self):
-        try:
-            asynchat.async_chat.handle_read(self)
-        except RetryError:
-            # This can be raised by (the overridden) recv().
-            pass
-
-    def initiate_send(self):
-        asynchat.async_chat.initiate_send(self)
-        if not self._closed:
-            # if there's still data to send we want to be ready
-            # for writing, else we're only intereseted in reading
-            if not self.producer_fifo:
-                wanted = self.ioloop.READ
-            else:
-                # In FTPHandler, we also want to listen for user input
-                # hence the READ. DTPHandler has its own initiate_send()
-                # which will either READ or WRITE.
-                wanted = self.ioloop.READ | self.ioloop.WRITE
-            if self._wanted_io_events != wanted:
-                self.ioloop.modify(self._fileno, wanted)
-                self._wanted_io_events = wanted
-        else:
-            debug("call: initiate_send(); called with no connection",
-                  inst=self)
+                self.initiate_send = self.initiate_sendfile
+                return
+        debug("starting transfer using send()", self)
+        self.push(producer.more())
 
     def close_when_done(self):
-        if len(self.producer_fifo) == 0:
-            self.handle_close()
+        self._closing = True
+
+    def initiate_send(self):
+        if self._buffer:
+            self.transport.write(b''.join(self._buffer))
+            self._buffer = []
+            self._buffer_len = 0
+
+    def initiate_sendfile(self):
+        """A wrapper around sendfile."""
+        try:
+            sent = sendfile(self.transport.get_extra_info('socket').fileno(), self._filefd, self._offset,
+                            self.ac_out_buffer_size)
+        except OSError as err:
+            if err.errno in _ERRNOS_RETRY or err.errno == errno.EBUSY:
+                return
+            elif err.errno in _ERRNOS_DISCONNECTED:
+                self.handle_close()
+            else:
+                if self.tot_bytes_sent == 0:
+                    logger.warning(
+                        "sendfile() failed; falling back on using plain send")
+                    raise _GiveUpOnSendfile
+                else:
+                    raise
         else:
-            self._closing = True
-            asynchat.async_chat.close_when_done(self)
+            if sent == 0:
+                # this signals the channel that the transfer is completed
+                self.discard_buffers()
+                self.handle_close()
+            else:
+                self._offset += sent
+                self.tot_bytes_sent += sent
 
     def close(self):
+        """Close the current channel disconnecting the client."""
+        debug("call: close()", inst=self)
         if not self._closed:
             self._closed = True
-            try:
-                asynchat.async_chat.close(self)
-            finally:
-                for fun in self._tasks:
-                    try:
-                        fun.cancel()
-                    except Exception:
-                        logger.error(traceback.format_exc())
-                self._tasks = []
-                self._closed = True
-                self._closing = False
-                self.connected = False
+            if self.transport is not None:
+                self.transport.close()
+
+            self._shutdown_connecting_dtp()
+
+            if self.data_channel is not None:
+                self.data_channel.close()
+                del self.data_channel
+
+            if self._out_dtp_queue is not None:
+                file = self._out_dtp_queue[2]
+                if file is not None:
+                    file.close()
+            if self._in_dtp_queue is not None:
+                file = self._in_dtp_queue[0]
+                if file is not None:
+                    file.close()
+
+            del self._out_dtp_queue
+            del self._in_dtp_queue
+
+            if self._idler is not None and not self._idler.cancelled:
+                self._idler.cancel()
+
+            # remove client IP address from ip map
+            if self.remote_ip in self.server.ip_map:
+                self.server.ip_map.remove(self.remote_ip)
+
+            if self.fs is not None:
+                self.fs.cmd_channel = None
+                self.fs = None
+            self.log("FTP session closed (disconnect).")
+            # Having self.remote_ip not set means that no connection
+            # actually took place, hence we're not interested in
+            # invoking the callback.
+            if self.remote_ip:
+                self.ioloop.call_later(0, self.on_disconnect,
+                                       _errback=self.handle_error)
 
 
 class Connector(AsyncChat):
-    """Same as base AsyncChat and supposed to be used for
-    clients.
-    """
+    """A class for handling asynchronous connections."""
 
     def add_channel(self, map=None, events=None):
-        AsyncChat.add_channel(self, map=map, events=self.ioloop.WRITE)
+        pass
 
 
 class Acceptor(AsyncChat):
-    """Same as base AsyncChat and supposed to be used to
-    accept new connections.
-    """
+    """A class for handling asynchronous acceptors."""
 
     def add_channel(self, map=None, events=None):
-        AsyncChat.add_channel(self, map=map, events=self.ioloop.READ)
+        pass
 
     def bind_af_unspecified(self, addr):
         """Same as bind() but guesses address family from addr.
@@ -988,22 +791,14 @@ class Acceptor(AsyncChat):
         """
         assert self.socket is None
         host, port = addr
-        if host == "":
-            # When using bind() "" is a symbolic name meaning all
-            # available interfaces. People might not know we're
-            # using getaddrinfo() internally, which uses None
-            # instead of "", so we'll make the conversion for them.
-            host = None
         err = "getaddrinfo() returned an empty list"
         info = socket.getaddrinfo(host, port, socket.AF_UNSPEC,
-                                  socket.SOCK_STREAM, 0, socket.AI_PASSIVE)
+                                   socket.SOCK_STREAM, 0, socket.AI_PASSIVE)
         for res in info:
             self.socket = None
-            self.del_channel()
             af, socktype, proto, canonname, sa = res
             try:
                 self.create_socket(af, socktype)
-                self.set_reuse_addr()
                 self.bind(sa)
             except socket.error as _:
                 err = _
@@ -1019,41 +814,20 @@ class Acceptor(AsyncChat):
         return af
 
     def listen(self, num):
-        AsyncChat.listen(self, num)
-        # XXX - this seems to be necessary, otherwise kqueue.control()
-        # won't return listening fd events
-        try:
-            if isinstance(self.ioloop, Kqueue):
-                self.ioloop.modify(self._fileno, self.ioloop.READ)
-        except NameError:
-            pass
+        self.socket.listen(num)
 
     def handle_accept(self):
         try:
-            sock, addr = self.accept()
-        except TypeError:
-            # sometimes accept() might return None, see:
-            # https://github.com/giampaolo/pyftpdlib/issues/91
-            debug("call: handle_accept(); accept() returned None", self)
-            return
+            sock, addr = self.socket.accept()
         except socket.error as err:
-            # ECONNABORTED might be thrown on *BSD, see:
-            # https://github.com/giampaolo/pyftpdlib/issues/105
-            if err.errno != errno.ECONNABORTED:
-                raise
-            else:
-                debug("call: handle_accept(); accept() returned ECONNABORTED",
-                      self)
-        else:
-            # sometimes addr == None instead of (ip, port) (see issue 104)
-            if addr is not None:
-                self.handle_accepted(sock, addr)
+            if err.errno in _ERRNOS_RETRY:
+                return
+            raise
+        self.handle_accepted(sock, addr)
 
     def handle_accepted(self, sock, addr):
-        sock.close()
-        self.log_info('unhandled accepted event', 'warning')
+        """Called when a new connection is accepted."""
+        pass
 
-    # overridden for convenience; avoid to reuse address on Windows
-    if (os.name in ('nt', 'ce')) or (sys.platform == 'cygwin'):
-        def set_reuse_addr(self):
-            pass
+    def set_reuse_addr(self):
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

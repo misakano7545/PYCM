@@ -71,6 +71,7 @@ class FTPServer(Acceptor):
            the queue is full the client may raise ECONNRESET.
            Defaults to 5.
         """
+        self.timeout = 300  # 确保timeout属性存在，兼容Acceptor/AsyncChat
         Acceptor.__init__(self, ioloop=ioloop)
         self.handler = handler
         self.backlog = backlog

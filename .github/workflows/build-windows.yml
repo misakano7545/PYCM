@@ -22,11 +22,15 @@ jobs:
         with:
           python-version: '3.7'
           architecture: 'x86'
+      - name: Install MinGW64
+        uses: bwoodsend/setup-winlibs-action@v1
+        with:
+          architecture: i686
       - name: Install requirements
         run: |
           pip install wheel
           pip install -r requirements.txt
-          pip install nuitka
+          pip install nuitka ordered-set zstandard
       - name: Add build info
         working-directory: Console
         run: |
@@ -74,11 +78,15 @@ jobs:
         with:
           python-version: '3.7'
           architecture: 'x86'
+      - name: Install MinGW64
+        uses: bwoodsend/setup-winlibs-action@v1
+        with:
+          architecture: i686
       - name: Install requirements
         run: |
           pip install wheel
           pip install -r requirements.txt
-          pip install nuitka
+          pip install nuitka ordered-set zstandard
       - name: Add build info
         working-directory: Client
         env:

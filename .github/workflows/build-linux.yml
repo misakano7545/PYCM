@@ -34,7 +34,7 @@ jobs:
       - name: Build
         working-directory: Console
         run: |
-          nuitka3 --standalone \
+          nuitka --standalone \
                   --include-data-file=Translation/*.qm=Translation/ \
                   --enable-plugin=pyqt5 --enable-plugin=multiprocessing \
                   --assume-yes-for-downloads --disable-ccache --remove-output \
@@ -80,7 +80,7 @@ jobs:
       - name: Build
         working-directory: Client
         run: |
-          nuitka3 --standalone \
+          nuitka --standalone \
                   --include-data-file=Translation/*.qm=Translation/ \
                   --enable-plugin=pyqt5 \
                   --assume-yes-for-downloads --disable-ccache --remove-output \
