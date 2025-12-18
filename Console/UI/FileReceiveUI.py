@@ -92,13 +92,13 @@ class Ui_FileReceiveDialog(object):
 
     def retranslateUi(self, FileReceiveDialog):
         _translate = QtCore.QCoreApplication.translate
-        FileReceiveDialog.setWindowTitle(_translate("FileReceiveDialog", "File Receive"))
-        self.receive_folder_label.setText(_translate("FileReceiveDialog", "Receive Folder: "))
-        self.receive_folder_change.setText(_translate("FileReceiveDialog", "Change"))
-        self.receive_folder_open.setText(_translate("FileReceiveDialog", "Open"))
+        FileReceiveDialog.setWindowTitle(_translate("FileReceiveDialog", "文件接收"))
+        self.receive_folder_label.setText(_translate("FileReceiveDialog", "接收文件夹: "))
+        self.receive_folder_change.setText(_translate("FileReceiveDialog", "更改"))
+        self.receive_folder_open.setText(_translate("FileReceiveDialog", "打开"))
         item = self.received_files.horizontalHeaderItem(0)
-        item.setText(_translate("FileReceiveDialog", "File Name"))
+        item.setText(_translate("FileReceiveDialog", "文件名"))
         item = self.received_files.horizontalHeaderItem(1)
-        item.setText(_translate("FileReceiveDialog", "From"))
-        self.show_selected_file_guide.setText(_translate("FileReceiveDialog", "Double click the row to open file"))
+        item.setText(_translate("FileReceiveDialog", "来源"))
+        self.show_selected_file_guide.setText(_translate("FileReceiveDialog", "双击行打开文件"))
 from Resources import Resources

@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_AboutDialog(object):
     def setupUi(self, AboutDialog):
         AboutDialog.setObjectName("AboutDialog")
-        AboutDialog.resize(487, 386)
+        AboutDialog.resize(487, 280)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -51,45 +51,18 @@ class Ui_AboutDialog(object):
         font = QtGui.QFont()
         font.setFamily("阿里巴巴普惠体")
         self.project_home.setFont(font)
-        self.project_home.setText("<html><head/><body><p><a href=\"https://github.com/yangzhongtian001/PYCM\"><span style=\" text-decoration: underline; color:#0000ff;\">https://github.com/yangzhongtian001/PYCM</span></a></p></body></html>")
+        self.project_home.setText("<html><head/><body><p><a href=\"https://www.ylwxfw.cn\"><span style=\" text-decoration: underline; color:#0000ff;\">https://www.ylwxfw.cn</span></a></p></body></html>")
         self.project_home.setAlignment(QtCore.Qt.AlignCenter)
         self.project_home.setOpenExternalLinks(True)
         self.project_home.setObjectName("project_home")
         self.title_layout.addWidget(self.project_home)
         self.thanks_info = QtWidgets.QLabel(AboutDialog)
-        self.thanks_info.setText("<html><head/><body><p>RichardYangZT(<a href=\"www.52pojie.cn\"><span style=\" text-decoration: underline; color:#0000ff;\">www.52pojie.cn</span></a>)</p></body></html>")
+        self.thanks_info.setText("广西聚本教育科技有限公司")
         self.thanks_info.setAlignment(QtCore.Qt.AlignCenter)
         self.thanks_info.setOpenExternalLinks(True)
         self.thanks_info.setObjectName("thanks_info")
         self.title_layout.addWidget(self.thanks_info)
         self.main_layout.addLayout(self.title_layout)
-        self.license_group = QtWidgets.QGroupBox(AboutDialog)
-        font = QtGui.QFont()
-        font.setFamily("阿里巴巴普惠体")
-        self.license_group.setFont(font)
-        self.license_group.setAlignment(QtCore.Qt.AlignCenter)
-        self.license_group.setObjectName("license_group")
-        self.license_group_layout = QtWidgets.QVBoxLayout(self.license_group)
-        self.license_group_layout.setObjectName("license_group_layout")
-        self.license_view = QtWidgets.QTextBrowser(self.license_group)
-        font = QtGui.QFont()
-        font.setFamily("阿里巴巴普惠体")
-        font.setBold(True)
-        font.setWeight(75)
-        self.license_view.setFont(font)
-        self.license_view.setHtml("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'阿里巴巴普惠体\',\'阿里巴巴普惠体\'; font-size:9pt; font-weight:600; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:10pt; font-weight:400;\">This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or at your option any later version.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'SimSun\'; font-size:10pt; font-weight:400;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:10pt; font-weight:400;\">This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. </span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'SimSun\'; font-size:10pt; font-weight:400;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:10pt; font-weight:400;\">You should have received a copy of the GNU General Public License along with this program. If not, see &lt;</span><a href=\"https://www.gnu.org/licenses/\"><span style=\" font-family:\'SimSun\'; font-size:10pt; font-weight:400; text-decoration: underline; color:#0000ff;\">https://www.gnu.org/licenses/</span></a><span style=\" font-family:\'SimSun\'; font-size:10pt; font-weight:400;\">&gt;.</span></p></body></html>")
-        self.license_view.setOpenExternalLinks(True)
-        self.license_view.setObjectName("license_view")
-        self.license_group_layout.addWidget(self.license_view)
-        self.main_layout.addWidget(self.license_group)
         self.operation_buttons = QtWidgets.QDialogButtonBox(AboutDialog)
         self.operation_buttons.setOrientation(QtCore.Qt.Horizontal)
         self.operation_buttons.setStandardButtons(QtWidgets.QDialogButtonBox.Ok)
@@ -104,8 +77,7 @@ class Ui_AboutDialog(object):
 
     def retranslateUi(self, AboutDialog):
         _translate = QtCore.QCoreApplication.translate
-        AboutDialog.setWindowTitle(_translate("AboutDialog", "About"))
-        self.productName.setText(_translate("AboutDialog", "PYCM Console"))
-        self.buildInfo.setText(_translate("AboutDialog", "No build info"))
-        self.license_group.setTitle(_translate("AboutDialog", "GNU General Public License"))
+        AboutDialog.setWindowTitle(_translate("AboutDialog", "关于"))
+        self.productName.setText(_translate("AboutDialog", "PYCM 控制台"))
+        self.buildInfo.setText(_translate("AboutDialog", "无构建信息"))
 from Resources import Resources

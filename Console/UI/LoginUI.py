@@ -76,12 +76,12 @@ class Ui_LoginForm(object):
 
     def retranslateUi(self, LoginForm):
         _translate = QtCore.QCoreApplication.translate
-        LoginForm.setWindowTitle(_translate("LoginForm", "PYCM Login"))
-        self.username.setPlaceholderText(_translate("LoginForm", "Default: admin"))
-        self.password.setPlaceholderText(_translate("LoginForm", "Default: 123456"))
-        self.title.setText(_translate("LoginForm", "PYCM Login"))
-        self.label_username.setText(_translate("LoginForm", "Username:"))
-        self.label_password.setText(_translate("LoginForm", "Password:"))
-        self.login_button.setText(_translate("LoginForm", "Login"))
+        LoginForm.setWindowTitle(_translate("LoginForm", "PYCM 登录"))
+        self.username.setPlaceholderText(_translate("LoginForm", "默认: admin"))
+        self.password.setPlaceholderText(_translate("LoginForm", "默认: 123456"))
+        self.title.setText(_translate("LoginForm", "PYCM 登录"))
+        self.label_username.setText(_translate("LoginForm", "用户名:"))
+        self.label_password.setText(_translate("LoginForm", "密码:"))
+        self.login_button.setText(_translate("LoginForm", "登录"))
         self.login_button.setShortcut(_translate("LoginForm", "Return"))
 from Resources import Resources

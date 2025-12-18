@@ -72,9 +72,9 @@ class Ui_FileServerForm(object):
 
     def retranslateUi(self, FileServerForm):
         _translate = QtCore.QCoreApplication.translate
-        FileServerForm.setWindowTitle(_translate("FileServerForm", "File Server"))
-        self.working_folder_label.setText(_translate("FileServerForm", "Target Folder: "))
-        self.working_folder_change.setText(_translate("FileServerForm", "Change"))
-        self.server_info.setText(_translate("FileServerForm", "Server Status: Stopped"))
-        self.toggle_working.setText(_translate("FileServerForm", "Start"))
+        FileServerForm.setWindowTitle(_translate("FileServerForm", "文件服务器"))
+        self.working_folder_label.setText(_translate("FileServerForm", "目标文件夹: "))
+        self.working_folder_change.setText(_translate("FileServerForm", "更改"))
+        self.server_info.setText(_translate("FileServerForm", "服务器状态: 已停止"))
+        self.toggle_working.setText(_translate("FileServerForm", "启动"))
 from Resources import Resources

@@ -70,8 +70,8 @@ class FileServerForm(QDialog):
 
     def update_status(self):
         if self.working:
-            self.ui.server_info.setText(self._translate('FileServerForm', 'Server Status: Working'))
+            self.ui.server_info.setText(self._translate('FileServerForm', '服务器状态: 运行中'))
             self.ui.toggle_working.setText(self._translate('FileServerForm', 'Stop'))
         else:
-            self.ui.server_info.setText(self._translate('FileServerForm', 'Server Status: Stopped'))
-            self.ui.toggle_working.setText(self._translate('FileServerForm', 'Start'))
+            self.ui.server_info.setText(self._translate('FileServerForm', '服务器状态: 已停止'))
+            self.ui.toggle_working.setText(self._translate('FileServerForm', '启动'))

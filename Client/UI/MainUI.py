@@ -110,11 +110,11 @@ class Ui_MainForm(object):
     def retranslateUi(self, MainForm):
         _translate = QtCore.QCoreApplication.translate
         MainForm.setWindowTitle(_translate("MainForm", "Client"))
-        self.title_label.setText(_translate("MainForm", "PYCM Client - Offline"))
-        self.notify_button.setText(_translate("MainForm", "Hands Up"))
-        self.file_button.setText(_translate("MainForm", "File"))
-        self.private_message_button.setText(_translate("MainForm", "Messaging"))
-        self.hide_button.setText(_translate("MainForm", "Hide"))
-        self.action_send_file.setText(_translate("MainForm", "Send File"))
-        self.action_file_client.setText(_translate("MainForm", "File Client"))
+        self.title_label.setText(_translate("MainForm", "PYCM 客户端 - 离线"))
+        self.notify_button.setText(_translate("MainForm", "举手"))
+        self.file_button.setText(_translate("MainForm", "文件"))
+        self.private_message_button.setText(_translate("MainForm", "消息"))
+        self.hide_button.setText(_translate("MainForm", "隐藏"))
+        self.action_send_file.setText(_translate("MainForm", "发送文件"))
+        self.action_file_client.setText(_translate("MainForm", "文件客户端"))
 from Resources import Resources

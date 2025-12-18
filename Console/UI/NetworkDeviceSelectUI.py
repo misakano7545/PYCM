@@ -40,5 +40,7 @@ class Ui_NetworkDeviceSelectDialog(object):
 
     def retranslateUi(self, NetworkDeviceSelectDialog):
         _translate = QtCore.QCoreApplication.translate
-        NetworkDeviceSelectDialog.setWindowTitle(_translate("NetworkDeviceSelectDialog", "Network Settings"))
+        NetworkDeviceSelectDialog.setWindowTitle(_translate("NetworkDeviceSelectDialog", "网络设置"))
+        self.operation_buttons.button(QtWidgets.QDialogButtonBox.Ok).setText("确定")
+        self.operation_buttons.button(QtWidgets.QDialogButtonBox.Cancel).setText("取消")
 from Resources import Resources

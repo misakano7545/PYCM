@@ -54,7 +54,7 @@ class FileReceiveForm(QDialog):
         self.ui.received_files.setItem(current_row, 1, label)
 
     def change_receive_folder(self):
-        directory = QFileDialog.getExistingDirectory(self, self._translate('FileReceiveDialog', 'Select Receive Folder'),
+        directory = QFileDialog.getExistingDirectory(self, self._translate('FileReceiveDialog', '选择接收文件夹'),
                                                      os.path.expanduser('~'))
         if not directory:
             return

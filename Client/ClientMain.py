@@ -17,10 +17,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from Utils import LoadTranslation
 import PyQt5.sip
 from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox
-from PyQt5.QtCore import Qt, QCoreApplication, QTranslator
+from PyQt5.QtCore import Qt, QCoreApplication
 import sys
 import os
 import logging
@@ -33,19 +32,11 @@ from Module import Theme
 from UI.Main import MainForm
 
 QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
+QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
 QApplication.setAttribute(Qt.AA_DisableWindowContextHelpButton)
 app = QApplication(sys.argv)
 app.setStyleSheet(Theme.load_stylesheet())
 app.setQuitOnLastWindowClosed(False)
-
-translator = QTranslator(app)
-qt_translator = QTranslator(app)
-language = LoadTranslation.load_translation()
-if language is not None:
-    translator.load(LoadTranslation.load_path(language))
-    qt_translator.load(LoadTranslation.load_path('qtbase_' + language))
-    app.installTranslator(translator)
-    app.installTranslator(qt_translator)
 
 config = Config()
 

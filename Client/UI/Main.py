@@ -105,7 +105,7 @@ class MainForm(QWidget):
         self.remote_spy_thread = RemoteSpyThread(self.config)
         self.private_message_object = PrivateMessage(self.config)
         self.init_connections()
-        self.ui.title_label.setText(self._translate('MainForm', 'PYCM Client - Offline'))
+        self.ui.title_label.setText(self._translate('MainForm', 'PYCM 客户端 - 离线'))
         self.update_tray_tooltip()
         self.ui.notify_button.setEnabled(False)
         self.ui.file_button.setEnabled(False)
@@ -116,12 +116,12 @@ class MainForm(QWidget):
     # noinspection PyArgumentList
     def init_tray(self):
         self.tray_icon_menu = QMenu(self)
-        self.tray_icon_menu.addAction(QAction(self._translate('MainForm', 'Show Tool Bar'), self, triggered=self.show))
-        self.tray_icon_menu.addAction(QAction(self._translate('MainForm', 'Configure Network'),
+        self.tray_icon_menu.addAction(QAction(self._translate('MainForm', '显示工具栏'), self, triggered=self.show))
+        self.tray_icon_menu.addAction(QAction(self._translate('MainForm', '网络配置'),
                                               self, triggered=self.show_network_config_window))
-        self.tray_icon_menu.addAction(QAction(self._translate('MainForm', 'About'),
+        self.tray_icon_menu.addAction(QAction(self._translate('MainForm', '关于'),
                                               self, triggered=self.show_about))
-        self.tray_icon_menu.addAction(QAction(self._translate('MainForm', 'Exit'), self, triggered=self.close))
+        self.tray_icon_menu.addAction(QAction(self._translate('MainForm', '退出'), self, triggered=self.close))
         self.tray_icon = QSystemTrayIcon(self)
         self.tray_icon.setIcon(QIcon(':/Core/Core/Logo.png'))
         self.tray_icon.setContextMenu(self.tray_icon_menu)
@@ -132,26 +132,28 @@ class MainForm(QWidget):
     # noinspection PyArgumentList
     def init_file_button(self):
         self.file_button_menu = QMenu()
-        self.file_client_action = QAction(self._translate('MainForm', 'File Client'), self,
+        self.file_client_action = QAction(self._translate('MainForm', '文件客户端'), self,
                                           triggered=self.show_file_client_window)
         self.file_client_action.setEnabled(False)
-        file_send_action = QAction(self._translate('MainForm', 'Send File'), self,
+        file_send_action = QAction(self._translate('MainForm', '发送文件'), self,
                                    triggered=self.show_file_send_window)
         self.file_button_menu.addActions([self.file_client_action, file_send_action])
         self.ui.file_button.setMenu(self.file_button_menu)
 
     def show_network_config_window(self):
-        reply = QMessageBox.question(self, self._translate('MainForm', 'Warning'),
-                                     self._translate('MainForm',
-                                                     'Are you sure to modify the network configuration? ' +
-                                                     'This operation may cause the client to fail to start normally!'),
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if reply == QMessageBox.Yes:
+        msg_box = QMessageBox(self)
+        msg_box.setWindowTitle(self._translate('MainForm', '警告'))
+        msg_box.setText(self._translate('MainForm', '确定要修改网络配置吗？此操作可能导致客户端无法正常启动！'))
+        msg_box.setIcon(QMessageBox.Question)
+        yes_btn = msg_box.addButton('是', QMessageBox.YesRole)
+        no_btn = msg_box.addButton('否', QMessageBox.NoRole)
+        msg_box.setDefaultButton(no_btn)
+        msg_box.exec_()
+        if msg_box.clickedButton() == yes_btn:
             result = self.config.modify_network_device()
             if result:
-                QMessageBox.information(self, self._translate('MainForm', 'Info'),
-                                        self._translate('MainForm', 'Configuration success! ' +
-                                                        'Please restart the client to take effect'),
+                QMessageBox.information(self, self._translate('MainForm', '提示'),
+                                        self._translate('MainForm', '配置成功！请重启客户端以使配置生效'),
                                         QMessageBox.Ok)
 
     def show_file_send_window(self):
@@ -193,7 +195,7 @@ class MainForm(QWidget):
         self.remote_spy_thread.set_socket_ip(self.server_ip)
         self.private_message_object.online_notify()
         self.class_broadcast_thread.start()
-        self.ui.title_label.setText(self._translate('MainForm', 'PYCM Client - Online'))
+        self.ui.title_label.setText(self._translate('MainForm', 'PYCM 客户端 - 在线'))
         self.update_tray_tooltip()
         self.ui.notify_button.setEnabled(True)
         self.ui.file_button.setEnabled(True)
@@ -222,8 +224,8 @@ class MainForm(QWidget):
         if self.server_ip:
             online_status = self._translate('MainForm', 'Online')
         else:
-            online_status = self._translate('MainForm', 'Offline')
-        self.tray_icon.setToolTip(self._translate('MainForm', 'PYCM Client\n') +
+            online_status = self._translate('MainForm', '离线')
+        self.tray_icon.setToolTip(self._translate('MainForm', 'PYCM 客户端\n') +
                                   self._translate('MainForm', 'Local IP: %s\n') % local_ip +
                                   self._translate('MainForm', 'Status: %s') % online_status)
 
@@ -260,10 +262,15 @@ class MainForm(QWidget):
 
     def closeEvent(self, event: QCloseEvent):
         if not self._force_quit:
-            reply = QMessageBox.question(self, self._translate('MainForm', 'Warning'),
-                                         self._translate('MainForm', 'Are you sure to exit?'),
-                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-            if reply != QMessageBox.Yes:
+            msg_box = QMessageBox(self)
+            msg_box.setWindowTitle(self._translate('MainForm', '警告'))
+            msg_box.setText(self._translate('MainForm', '确定要退出吗？'))
+            msg_box.setIcon(QMessageBox.Question)
+            yes_btn = msg_box.addButton('是', QMessageBox.YesRole)
+            no_btn = msg_box.addButton('否', QMessageBox.NoRole)
+            msg_box.setDefaultButton(no_btn)
+            msg_box.exec_()
+            if msg_box.clickedButton() != yes_btn:
                 event.ignore()
                 return
         if self.server_ip is not None:
