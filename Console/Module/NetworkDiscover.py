@@ -42,11 +42,12 @@ class NetworkDiscover(object):
     def __init_socket_obj(self):
         self.socket_obj = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.socket_obj.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 255)
-        self.socket_obj.setsockopt(
-            socket.IPPROTO_IP,
-            socket.IP_ADD_MEMBERSHIP,
-            socket.inet_aton(self.socket_ip) + socket.inet_aton(self.current_ip)
-        )
+        try:
+            mreq = socket.inet_aton(self.socket_ip) + socket.inet_aton(self.current_ip)
+        except OSError:
+            # 如果 current_ip 无效，使用 INADDR_ANY
+            mreq = struct.pack('4sL', socket.inet_aton(self.socket_ip), socket.INADDR_ANY)
+        self.socket_obj.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
     def start(self):
         while True:
