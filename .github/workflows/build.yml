@@ -291,7 +291,7 @@ jobs:
         run: |
           pip install wheel
           pip install -r requirements.txt
-          pip install pyinstaller sip
+          pip install pyinstaller sip pillow
       - name: Add build info
         working-directory: Console
         run: |
@@ -345,7 +345,7 @@ jobs:
         run: |
           pip install wheel
           pip install -r requirements.txt
-          pip install pyinstaller sip
+          pip install pyinstaller sip pillow
       - name: Add build info
         working-directory: Client
         run: |
