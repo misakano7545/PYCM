@@ -1,21 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-    This file is part of PYCM project
-    Copyright (C) 2021 Richard Yang  <zhongtian.yang@qq.com>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
 
 from PyQt5.QtWidgets import QDialog, QFileDialog, QMessageBox
 from PyQt5.QtCore import QCoreApplication
@@ -43,7 +26,7 @@ class FileServerForm(QDialog):
         return ''.join(password)
 
     def change_working_folder(self):
-        directory = QFileDialog.getExistingDirectory(self, self._translate('FileServerForm', 'Select Working Folder'),
+        directory = QFileDialog.getExistingDirectory(self, self._translate('FileServerForm', '选择工作文件夹'),
                                                      os.path.expanduser('~'))
         if not directory:
             return
@@ -54,8 +37,8 @@ class FileServerForm(QDialog):
     def toggle_server(self):
         if not self.working:
             if self.working_folder is None:
-                QMessageBox.critical(self, self._translate('FileServerForm', 'Error'),
-                                     self._translate('FileServerForm', 'No working folder set!'))
+                QMessageBox.critical(self, self._translate('FileServerForm', '错误'),
+                                     self._translate('FileServerForm', '未设置工作文件夹！'))
             else:
                 ftp_password = self.__generate_ftp_password()
                 self.parent.file_server_thread.set_password(ftp_password)
@@ -71,7 +54,7 @@ class FileServerForm(QDialog):
     def update_status(self):
         if self.working:
             self.ui.server_info.setText(self._translate('FileServerForm', '服务器状态: 运行中'))
-            self.ui.toggle_working.setText(self._translate('FileServerForm', 'Stop'))
+            self.ui.toggle_working.setText(self._translate('FileServerForm', '停止'))
         else:
             self.ui.server_info.setText(self._translate('FileServerForm', '服务器状态: 已停止'))
             self.ui.toggle_working.setText(self._translate('FileServerForm', '启动'))

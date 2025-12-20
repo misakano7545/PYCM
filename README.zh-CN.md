@@ -6,7 +6,6 @@
 [![GitHub license](https://img.shields.io/github/license/yangzhongtian001/PYCM)](https://github.com/yangzhongtian001/PYCM)
 [![Code Factor](https://www.codefactor.io/repository/github/yangzhongtian001/pycm/badge/master)](https://www.codefactor.io/repository/github/yangzhongtian001/pycm/overview/master)
 ![Build Windows](https://github.com/yangzhongtian001/PYCM/actions/workflows/build-windows.yml/badge.svg)
-![Build MacOS](https://github.com/yangzhongtian001/PYCM/actions/workflows/build-mac.yml/badge.svg)
 ![Build Linux](https://github.com/yangzhongtian001/PYCM/actions/workflows/build-linux.yml/badge.svg)
 
 [English](README.md) [简体中文](README.zh-CN.md)

@@ -368,7 +368,7 @@ p, li { white-space: pre-wrap; }
                <item>
                 <widget class="QPushButton" name="client_quit">
                  <property name="text">
-                  <string>Quit Client</string>
+                  <string>退出客户端</string>
                  </property>
                 </widget>
                </item>
@@ -391,7 +391,7 @@ p, li { white-space: pre-wrap; }
                   </size>
                  </property>
                  <property name="text">
-                  <string>Messaging</string>
+                  <string>消息</string>
                  </property>
                 </widget>
                </item>
@@ -476,7 +476,7 @@ p, li { white-space: pre-wrap; }
   </widget>
   <action name="client_sort">
    <property name="text">
-    <string>Arrange Client</string>
+    <string>排列客户端</string>
    </property>
   </action>
   <action name="client_select_all">

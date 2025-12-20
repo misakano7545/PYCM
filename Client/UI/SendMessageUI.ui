@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Messaging</string>
+   <string>消息</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../Resources/Resources.qrc">
@@ -65,7 +65,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Send</string>
+        <string>发送</string>
        </property>
       </widget>
      </item>

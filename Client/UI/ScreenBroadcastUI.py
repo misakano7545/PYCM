@@ -99,9 +99,9 @@ class Ui_ScreenBroadcastForm(object):
 
     def retranslateUi(self, ScreenBroadcastForm):
         _translate = QtCore.QCoreApplication.translate
-        ScreenBroadcastForm.setWindowTitle(_translate("ScreenBroadcastForm", "Screen Broadcast"))
-        self.freeze_frame.setText(_translate("ScreenBroadcastForm", "Freeze Screen"))
-        self.full_screen.setText(_translate("ScreenBroadcastForm", "Full Screen"))
-        self.screen_shot.setText(_translate("ScreenBroadcastForm", "Screen Shot"))
-        self.always_on_top.setText(_translate("ScreenBroadcastForm", "Always On Top"))
+        ScreenBroadcastForm.setWindowTitle(_translate("ScreenBroadcastForm", "屏幕广播"))
+        self.freeze_frame.setText(_translate("ScreenBroadcastForm", "冻结屏幕"))
+        self.full_screen.setText(_translate("ScreenBroadcastForm", "全屏"))
+        self.screen_shot.setText(_translate("ScreenBroadcastForm", "截图"))
+        self.always_on_top.setText(_translate("ScreenBroadcastForm", "始终置顶"))
 from Resources import Resources

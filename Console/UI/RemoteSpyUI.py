@@ -36,5 +36,5 @@ class Ui_RemoteSpy(object):
 
     def retranslateUi(self, RemoteSpy):
         _translate = QtCore.QCoreApplication.translate
-        RemoteSpy.setWindowTitle(_translate("RemoteSpy", "Remote View"))
+        RemoteSpy.setWindowTitle(_translate("RemoteSpy", "远程查看"))
 from Resources import Resources

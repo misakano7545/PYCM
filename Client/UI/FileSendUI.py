@@ -90,9 +90,9 @@ class Ui_FileSendForm(object):
 
     def retranslateUi(self, FileSendForm):
         _translate = QtCore.QCoreApplication.translate
-        FileSendForm.setWindowTitle(_translate("FileSendForm", "Submit Files"))
-        self.add_file_button.setText(_translate("FileSendForm", "Add Files"))
-        self.delete_file_button.setText(_translate("FileSendForm", "Remove Selected Files"))
-        self.submit_file_button.setText(_translate("FileSendForm", "Submit All Files"))
-        self.file_send_progress_label.setText(_translate("FileSendForm", "Ready"))
+        FileSendForm.setWindowTitle(_translate("FileSendForm", "提交文件"))
+        self.add_file_button.setText(_translate("FileSendForm", "添加文件"))
+        self.delete_file_button.setText(_translate("FileSendForm", "删除选中文件"))
+        self.submit_file_button.setText(_translate("FileSendForm", "提交所有文件"))
+        self.file_send_progress_label.setText(_translate("FileSendForm", "就绪"))
 from Resources import Resources

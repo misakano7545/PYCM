@@ -1,21 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-    This file is part of PYCM project
-    Copyright (C) 2021 Richard Yang  <zhongtian.yang@qq.com>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
 
 from PyQt5.QtWidgets import QWidget, QTableWidget, QTableWidgetItem, QAbstractItemView, QHeaderView, \
     QFileIconProvider, QApplication, QFileDialog, QMessageBox
@@ -73,9 +56,9 @@ class DraggableQListWidget(QTableWidget):
         self.setAcceptDrops(True)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setColumnCount(3)
-        self.setHorizontalHeaderLabels([self._translate('FileSendForm', 'File Name'),
-                                        self._translate('FileSendForm', 'File Size'),
-                                        self._translate('FileSendForm', 'Status')])
+        self.setHorizontalHeaderLabels([self._translate('FileSendForm', '文件名'),
+                                        self._translate('FileSendForm', '文件大小'),
+                                        self._translate('FileSendForm', '状态')])
         self.verticalHeader().setVisible(False)
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
@@ -109,7 +92,7 @@ class DraggableQListWidget(QTableWidget):
             self.setRowCount(current_row + 1)
             self.setItem(current_row, 0, file_name_and_icon)
             self.setItem(current_row, 1, QTableWidgetItem(self.parse_file_size(file_info.size())))
-            self.setItem(current_row, 2, QTableWidgetItem(self._translate('FileSendForm', 'Ready')))
+            self.setItem(current_row, 2, QTableWidgetItem(self._translate('FileSendForm', '就绪')))
 
     def dragEnterEvent(self, event: QDragEnterEvent):
         if event.mimeData().hasUrls():
@@ -152,9 +135,9 @@ class FileSendForm(QWidget):
         self.ui.file_list_container.addWidget(self.ui.file_list)
 
     def show_add_file_dialog(self):
-        files, _ = QFileDialog.getOpenFileNames(self, self._translate('FileSendForm', 'Select Files'),
+        files, _ = QFileDialog.getOpenFileNames(self, self._translate('FileSendForm', '选择文件'),
                                                 os.path.expanduser('~'),
-                                                self._translate('FileSendForm', 'All Files (*)'))
+                                                self._translate('FileSendForm', '所有文件 (*)'))
         if files:
             self.ui.file_list.batch_add_files(list(map(QFileInfo, files)))
 
@@ -168,10 +151,10 @@ class FileSendForm(QWidget):
         file_list = [self.ui.file_list.item(row, 0).text() for row in range(self.ui.file_list.rowCount())]
         self.__compress_thread = FileCompressThread(file_list)
         self.__compress_thread.file_finished.connect(partial(self.update_status,
-                                                             self._translate('FileSendForm', 'Compressed')))
+                                                             self._translate('FileSendForm', '已压缩')))
         self.__compress_thread.file_buffer.connect(self.submit_compressed_file)
         self.is_sending = True
-        self.ui.file_send_progress_label.setText(self._translate('FileSendForm', 'Compressing'))
+        self.ui.file_send_progress_label.setText(self._translate('FileSendForm', '压缩中'))
         self.__compress_thread.start()
 
     def submit_compressed_file(self, file_buffer):
@@ -186,7 +169,7 @@ class FileSendForm(QWidget):
         if index + 1 < current_row_count:
             self.update_send_status((index + 1) / current_row_count)
         else:
-            self.ui.file_send_progress_label.setText(self._translate('FileSendForm', 'Submitting'))
+            self.ui.file_send_progress_label.setText(self._translate('FileSendForm', '提交中'))
             self.update_send_status(0)
 
     def update_send_status(self, progress):
@@ -195,14 +178,14 @@ class FileSendForm(QWidget):
         if progress >= 100 and not self.is_sent:
             self.is_sent = True
             self.ui.file_send_progress_bar.setMaximum(0)
-            self.ui.file_send_progress_label.setText(self._translate('FileSendForm', 'Processing'))
+            self.ui.file_send_progress_label.setText(self._translate('FileSendForm', '处理中'))
 
     def file_received(self):
         self.ui.file_send_progress_bar.setMaximum(100)
         self.ui.file_send_progress_bar.setValue(100)
-        self.ui.file_send_progress_label.setText(self._translate('FileSendForm', 'Finished'))
-        QMessageBox.information(self, self._translate('FileSendForm', 'Info'),
-                                self._translate('FileSendForm', 'Submit Success!'))
+        self.ui.file_send_progress_label.setText(self._translate('FileSendForm', '完成'))
+        QMessageBox.information(self, self._translate('FileSendForm', '提示'),
+                                self._translate('FileSendForm', '提交成功！'))
         self.is_sent = False
         self.close()
 

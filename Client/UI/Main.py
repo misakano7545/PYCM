@@ -1,21 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-    This file is part of PYCM project
-    Copyright (C) 2021 Richard Yang  <zhongtian.yang@qq.com>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
 
 from PyQt5.QtWidgets import QWidget, QSystemTrayIcon, QAction, QMenu, QMessageBox, QApplication
 from PyQt5.QtCore import Qt, QPoint, QTimer, pyqtSignal, QCoreApplication
@@ -183,7 +166,7 @@ class MainForm(QWidget):
 
     def message_received(self, message):
         icon = QSystemTrayIcon.MessageIcon()
-        self.tray_icon.showMessage(self._translate('MainForm', 'Message'), message, icon, 1000)
+        self.tray_icon.showMessage(self._translate('MainForm', '消息'), message, icon, 1000)
         self.messaging_window.add_message(True, message)
 
     def notify_console(self):
@@ -222,12 +205,12 @@ class MainForm(QWidget):
     def update_tray_tooltip(self):
         local_ip = self.config.get_item('Network/Local/IP')
         if self.server_ip:
-            online_status = self._translate('MainForm', 'Online')
+            online_status = self._translate('MainForm', '在线')
         else:
             online_status = self._translate('MainForm', '离线')
         self.tray_icon.setToolTip(self._translate('MainForm', 'PYCM 客户端\n') +
-                                  self._translate('MainForm', 'Local IP: %s\n') % local_ip +
-                                  self._translate('MainForm', 'Status: %s') % online_status)
+                                  self._translate('MainForm', '本地IP: %s\n') % local_ip +
+                                  self._translate('MainForm', '状态: %s') % online_status)
 
     def quit_self(self):
         self._force_quit = True

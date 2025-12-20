@@ -109,7 +109,7 @@ class Ui_MainForm(object):
 
     def retranslateUi(self, MainForm):
         _translate = QtCore.QCoreApplication.translate
-        MainForm.setWindowTitle(_translate("MainForm", "Client"))
+        MainForm.setWindowTitle(_translate("MainForm", "客户端"))
         self.title_label.setText(_translate("MainForm", "PYCM 客户端 - 离线"))
         self.notify_button.setText(_translate("MainForm", "举手"))
         self.file_button.setText(_translate("MainForm", "文件"))

@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Messaging</string>
+   <string>消息</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../Resources/Resources.qrc">
@@ -33,7 +33,7 @@
    <item>
     <widget class="QGroupBox" name="send_message_group">
      <property name="title">
-      <string>Message Input</string>
+      <string>消息输入</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="leftMargin">

@@ -54,6 +54,6 @@ class Ui_SendMessageGroupDialog(object):
 
     def retranslateUi(self, SendMessageGroupDialog):
         _translate = QtCore.QCoreApplication.translate
-        SendMessageGroupDialog.setWindowTitle(_translate("SendMessageGroupDialog", "Messaging"))
-        self.send_message_group.setTitle(_translate("SendMessageGroupDialog", "Message Input"))
+        SendMessageGroupDialog.setWindowTitle(_translate("SendMessageGroupDialog", "消息"))
+        self.send_message_group.setTitle(_translate("SendMessageGroupDialog", "消息输入"))
 from Resources import Resources

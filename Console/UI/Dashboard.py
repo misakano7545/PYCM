@@ -1,21 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-    This file is part of PYCM project
-    Copyright (C) 2021 Richard Yang  <zhongtian.yang@qq.com>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
 
 from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication, QDialog, QListWidgetItem, QLabel, QMessageBox, \
     QInputDialog, QLineEdit, QSystemTrayIcon, QAction, QMenu
@@ -257,21 +240,21 @@ class DashboardForm(QMainWindow):
         if result == remote_command_group_dialog.Accepted:
             command = remote_command_group_dialog.ui.command_select.selectedItems()
             if len(command) == 0:
-                QMessageBox.critical(self, self._translate('DashboardForm', 'Error'),
-                                     self._translate('DashboardForm', 'No command selected'))
+                QMessageBox.critical(self, self._translate('DashboardForm', '错误'),
+                                     self._translate('DashboardForm', '未选择命令'))
                 return
             command = command[0]
             selected_label = command.text()
             selected_command = command.data(Qt.UserRole)
-            confirm = QMessageBox.question(self, self._translate('DashboardForm', 'Confirm'),
+            confirm = QMessageBox.question(self, self._translate('DashboardForm', '确认'),
                                            self._translate('DashboardForm',
-                                                           'Confirm to send command: %s ?') % selected_label,
+                                                           '确认发送命令: %s ?') % selected_label,
                                            QMessageBox.Yes | QMessageBox.No)
             if confirm != QMessageBox.Yes:
                 return
             self.class_broadcast_object.send_command(targets, selected_command)
-            QMessageBox.information(self, self._translate('DashboardForm', 'Info'),
-                                    self._translate('DashboardForm', 'Command send successfully'))
+            QMessageBox.information(self, self._translate('DashboardForm', '提示'),
+                                    self._translate('DashboardForm', '命令发送成功'))
 
     def toggle_remote_spy(self, working):
         if working:
@@ -280,8 +263,8 @@ class DashboardForm(QMainWindow):
                 self.ui.remote_spy.setChecked(False)
                 return
             if len(targets) > 1:
-                QMessageBox.warning(self, self._translate('DashboardForm', 'Warning'),
-                                    self._translate('DashboardForm', 'Only support to view one client each time'))
+                QMessageBox.warning(self, self._translate('DashboardForm', '警告'),
+                                    self._translate('DashboardForm', '每次只能查看一个客户端'))
                 self.ui.remote_spy.setChecked(False)
                 return
             self.remote_spy_thread.start()
@@ -328,8 +311,8 @@ class DashboardForm(QMainWindow):
                 self.hide()
 
     def closeEvent(self, event: QCloseEvent):
-        reply = QMessageBox.question(self, self._translate('DashboardForm', 'Warning'),
-                                     self._translate('DashboardForm', 'Are you sure to exit?'),
+        reply = QMessageBox.question(self, self._translate('DashboardForm', '警告'),
+                                     self._translate('DashboardForm', '确定要退出吗？'),
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply != QMessageBox.Yes:
             event.ignore()

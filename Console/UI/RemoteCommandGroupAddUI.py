@@ -58,7 +58,7 @@ class Ui_RemoteCommandGroupAddDialog(object):
 
     def retranslateUi(self, RemoteCommandGroupAddDialog):
         _translate = QtCore.QCoreApplication.translate
-        RemoteCommandGroupAddDialog.setWindowTitle(_translate("RemoteCommandGroupAddDialog", "Add Remote Command"))
-        self.title_label.setText(_translate("RemoteCommandGroupAddDialog", "Name"))
-        self.command_label.setText(_translate("RemoteCommandGroupAddDialog", "Command"))
+        RemoteCommandGroupAddDialog.setWindowTitle(_translate("RemoteCommandGroupAddDialog", "添加远程命令"))
+        self.title_label.setText(_translate("RemoteCommandGroupAddDialog", "名称"))
+        self.command_label.setText(_translate("RemoteCommandGroupAddDialog", "命令"))
 from Resources import Resources
