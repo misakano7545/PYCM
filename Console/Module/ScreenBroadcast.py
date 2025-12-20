@@ -2,7 +2,7 @@
 
 from PyQt5.QtCore import QObject, QBuffer, QIODevice
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtGui import QImage, QPainter, QCursor
+from PyQt5.QtGui import QImage, QPainter, QCursor, QPixmap
 from PyQt5.sip import voidptr
 from Module.Packages import ScreenBroadcastFlag
 import socket
@@ -50,6 +50,7 @@ class ScreenBroadcast(QObject):
                 painter.begin(img)
                 painter.drawImage(cursor_pos, cursor_icon)
                 painter.end()
+                # 控制台不需要显示画面，只发送给客户端
                 buffer = QBuffer()
                 buffer.open(QIODevice.ReadWrite)
                 img.save(buffer, 'JPEG', quality=self.quality)

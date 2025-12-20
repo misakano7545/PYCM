@@ -76,7 +76,15 @@ class ScreenBroadcast(QObject):
 
     def start(self):
         Thread(target=self.__receive_thread, daemon=True).start()
+        from queue import Empty
         while self.working:
-            frame_raw = self.frames_queue.get()
-            frame_qimage = QImage.fromData(frame_raw)
-            self.parent.frame_received.emit(QPixmap.fromImage(frame_qimage))
+            try:
+                frame_raw = self.frames_queue.get(timeout=0.1)
+                frame_qimage = QImage.fromData(frame_raw)
+                if not frame_qimage.isNull():
+                    self.parent.frame_received.emit(QPixmap.fromImage(frame_qimage))
+            except Empty:
+                continue
+            except Exception as e:
+                logging.warning(f'Failed to process frame: {e}')
+                continue

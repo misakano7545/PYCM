@@ -62,6 +62,8 @@ class PrivateMessageThread(QThread):
 
 
 class ScreenBroadcastThread(QThread):
+    frame_received = pyqtSignal(QPixmap)
+
     def __init__(self, config: Config, parent=None):
         super(ScreenBroadcastThread, self).__init__(parent)
         self.current_ip = config.get_item('Network/Local/IP')

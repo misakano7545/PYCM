@@ -32,14 +32,42 @@ class ScreenBroadcastForm(QWidget):
     def freeze_frame(self, freeze=True):
         self.freeze = freeze
 
-    def show_full_screen(self, fullscreen=True):
+    def show_full_screen(self, fullscreen=True, hide_control_bar=False):
+        """切换全屏模式
+        Args:
+            fullscreen: True 为全屏，False 为窗口模式
+            hide_control_bar: True 时隐藏控制栏（控制台强制全屏时使用），False 时保持控制栏显示（客户端自己点击全屏时使用）
+        """
         if fullscreen:
             self.showFullScreen()
+            # 只有控制台强制全屏时才隐藏控制栏
+            if hide_control_bar:
+                self._hide_control_bar()
         else:
             self.showNormal()
+            # 窗口模式下始终显示控制栏
+            self._show_control_bar()
+
+    def _hide_control_bar(self):
+        """隐藏控制栏"""
+        # 隐藏控制栏中的所有按钮
+        for i in range(self.ui.control_box_layout.count()):
+            item = self.ui.control_box_layout.itemAt(i)
+            if item and item.widget():
+                item.widget().hide()
+
+    def _show_control_bar(self):
+        """显示控制栏"""
+        # 显示控制栏中的所有按钮
+        for i in range(self.ui.control_box_layout.count()):
+            item = self.ui.control_box_layout.itemAt(i)
+            if item and item.widget():
+                item.widget().show()
 
     def screen_shot(self):
         frame = self.ui.screen_display.pixmap()
+        if frame is None or frame.isNull():
+            return
         frame = frame.toImage()
         file_path, _ = QFileDialog.getSaveFileName(self, self._translate('ScreenBroadcastForm', '选择保存路径'),
                                                    str(QDir.homePath()),

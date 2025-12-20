@@ -91,7 +91,13 @@ class ClassBroadcast(QObject):
                         self.batch_data_handler(unpacked_flag, data)
                 elif unpacked_flag == ClassBroadcastFlag.ToggleScreenBroadcast:
                     if unpacked_data[0] == ord('1'):
+                        # 窗口模式
                         self.parent.toggle_screen_broadcats.emit(True)
+                        self.parent.screen_broadcast_mode.emit(1)
+                    elif unpacked_data[0] == ord('2'):
+                        # 全屏模式
+                        self.parent.toggle_screen_broadcats.emit(True)
+                        self.parent.screen_broadcast_mode.emit(2)
                     elif unpacked_data[0] == ord('0'):
                         self.parent.toggle_screen_broadcats.emit(False)
                 elif unpacked_flag == ClassBroadcastFlag.ConsoleQuit:

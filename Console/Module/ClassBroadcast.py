@@ -65,6 +65,12 @@ class ClassBroadcast(QObject):
         else:
             self.send_data(ClassBroadcastFlag.ToggleScreenBroadcast, b'0')
 
+    def screen_broadcast_mode_notify(self, mode):
+        """通知客户端切换屏幕广播模式
+        mode: 1 = 窗口模式, 2 = 全屏模式
+        """
+        self.send_data(ClassBroadcastFlag.ToggleScreenBroadcast, str(mode).encode())
+
     def remote_quit_notify(self, clients):
         self.batch_send(ClassBroadcastFlag.RemoteQuit, clients, b'')
 

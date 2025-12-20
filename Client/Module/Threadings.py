@@ -12,6 +12,7 @@ class ClassBroadcastThread(QThread):
     message_received = pyqtSignal(str)
     reset_all = pyqtSignal()
     toggle_screen_broadcats = pyqtSignal(bool)
+    screen_broadcast_mode = pyqtSignal(int)  # 1 = 窗口模式, 2 = 全屏模式
     start_remote_spy = pyqtSignal()
     quit_self = pyqtSignal()
     client_file_received = pyqtSignal()
@@ -61,7 +62,10 @@ class ScreenBroadcastThread(QThread):
 
     def safe_stop(self):
         self.socket.working = False
-        self.terminate()
+        self.wait(3000)  # 等待最多3秒让线程自然结束
+        if self.isRunning():
+            self.terminate()
+            self.wait(1000)  # 如果还在运行，强制终止并等待
 
 
 class RemoteSpyThread(QThread):

@@ -14,6 +14,7 @@ from .RemoteSpy import RemoteSpyForm
 from .FileReceive import FileReceiveForm
 from .FileServer import FileServerForm
 from .About import AboutDialog
+from .ScreenBroadcast import ScreenBroadcastForm
 
 from Module.Threadings import NetworkDiscoverThread, PrivateMessageThread, ScreenBroadcastThread, RemoteSpyThread, \
     FileServerThread
@@ -53,6 +54,7 @@ class DashboardForm(QMainWindow):
         self.remote_spy_window = RemoteSpyForm(self)
         self.file_receive_window = FileReceiveForm(self)
         self.file_server_window = FileServerForm(self)
+        self.screen_broadcast_window = ScreenBroadcastForm(self)
 
     def init_threads(self):
         self.net_discover_thread = NetworkDiscoverThread(self.config, self)
@@ -74,6 +76,7 @@ class DashboardForm(QMainWindow):
         self.private_message_thread.client_file_received.connect(partial(self.__logger, 'file_received'))
         self.private_message_thread.client_message_received.connect(partial(self.__logger, 'message_received'))
         self.remote_spy_thread.frame_received.connect(self.remote_spy_window.update_frame)
+        # 控制台不需要显示屏幕内容，只需要工具栏
 
     def init_network_device(self, device):
         self.config.save('Network/Local/IP', device['IP'])
@@ -279,9 +282,21 @@ class DashboardForm(QMainWindow):
         if working:
             self.screen_broadcast_thread.start()
             self.class_broadcast_object.screen_broadcast_notify(True)
+            self.screen_broadcast_window.show()
+            # 开启屏幕广播时，隐藏Dashboard主窗口
+            self.hide()
+            # 隐藏Dashboard的托盘图标，只显示屏幕广播工具栏的托盘图标
+            if self.tray_icon.isVisible():
+                self.tray_icon.hide()
         else:
             self.class_broadcast_object.screen_broadcast_notify(False)
             self.screen_broadcast_thread.safe_stop()
+            self.screen_broadcast_window.hide()
+            # 结束屏幕广播时，恢复Dashboard主窗口显示
+            self.show()
+            # 恢复Dashboard的托盘图标
+            if not self.tray_icon.isVisible():
+                self.tray_icon.show()
 
     def show_file_receive(self, file_url: QUrl = None):
         if file_url is not None and type(file_url) != bool:
@@ -300,6 +315,10 @@ class DashboardForm(QMainWindow):
 
     def show_window(self, reason=None):
         if reason is not False and reason != QSystemTrayIcon.DoubleClick:
+            return
+        # 如果屏幕广播正在进行中，只显示屏幕广播工具栏，不显示Dashboard
+        if hasattr(self, 'screen_broadcast_window') and self.screen_broadcast_window.isVisible():
+            self.screen_broadcast_window.show_toolbar()
             return
         self.activateWindow()
         self.showNormal()
@@ -320,6 +339,9 @@ class DashboardForm(QMainWindow):
         self.class_broadcast_object.screen_broadcast_notify(False)
         self.class_broadcast_object.file_server_status_notify(False)
         self.class_broadcast_object.console_quit_notify()
+        # 关闭屏幕广播窗口
+        if hasattr(self, 'screen_broadcast_window'):
+            self.screen_broadcast_window.close()
         for thread_name in self.threadings.keys():
             thread = getattr(self, thread_name)
             thread.safe_stop()

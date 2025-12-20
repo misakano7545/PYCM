@@ -71,6 +71,7 @@ class MainForm(QWidget):
         self.class_broadcast_thread.message_received.connect(self.message_received)
         self.class_broadcast_thread.reset_all.connect(self.reset_all_threadings)
         self.class_broadcast_thread.toggle_screen_broadcats.connect(self.__toggle_screen_broadcast)
+        self.class_broadcast_thread.screen_broadcast_mode.connect(self.__toggle_screen_broadcast_mode)
         self.class_broadcast_thread.quit_self.connect(self.quit_self)
         self.class_broadcast_thread.start_remote_spy.connect(self.start_remote_spy)
         self.class_broadcast_thread.toggle_file_server.connect(self.toggle_file_client)
@@ -194,13 +195,23 @@ class MainForm(QWidget):
         self.config.save('Network/Local/MAC', device['MAC'])
 
     def __toggle_screen_broadcast(self, work):
-        self.screen_broadcast_thread.socket.working = work
         if work:
+            self.screen_broadcast_thread.socket.working = True
             self.screen_broadcast_thread.start()
             self.screen_broadcast_window.show()
         else:
+            self.screen_broadcast_thread.socket.working = False
             self.screen_broadcast_thread.safe_stop()
             self.screen_broadcast_window.hide()
+
+    def __toggle_screen_broadcast_mode(self, mode):
+        """切换屏幕广播模式：1 = 窗口模式, 2 = 全屏模式（控制台强制全屏，隐藏工具栏）"""
+        if mode == 2:
+            # 全屏模式（控制台强制全屏，隐藏工具栏）
+            self.screen_broadcast_window.show_full_screen(True, hide_control_bar=True)
+        elif mode == 1:
+            # 窗口模式
+            self.screen_broadcast_window.show_full_screen(False)
 
     def update_tray_tooltip(self):
         local_ip = self.config.get_item('Network/Local/IP')
