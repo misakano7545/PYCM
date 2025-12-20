@@ -108,13 +108,12 @@ class Ui_MainForm(object):
         QtCore.QMetaObject.connectSlotsByName(MainForm)
 
     def retranslateUi(self, MainForm):
-        _translate = QtCore.QCoreApplication.translate
-        MainForm.setWindowTitle(_translate("MainForm", "客户端"))
-        self.title_label.setText(_translate("MainForm", "PYCM 客户端 - 离线"))
-        self.notify_button.setText(_translate("MainForm", "举手"))
-        self.file_button.setText(_translate("MainForm", "文件"))
-        self.private_message_button.setText(_translate("MainForm", "消息"))
-        self.hide_button.setText(_translate("MainForm", "隐藏"))
-        self.action_send_file.setText(_translate("MainForm", "发送文件"))
-        self.action_file_client.setText(_translate("MainForm", "文件客户端"))
+        MainForm.setWindowTitle("客户端")
+        self.title_label.setText("PYCM 客户端 - 离线")
+        self.notify_button.setText("举手")
+        self.file_button.setText("文件")
+        self.private_message_button.setText("消息")
+        self.hide_button.setText("隐藏")
+        self.action_send_file.setText("发送文件")
+        self.action_file_client.setText("文件客户端")
 from Resources import Resources

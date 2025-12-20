@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtWidgets import QDialog, QApplication, QMessageBox
-from PyQt5.QtCore import QCoreApplication
 import os
 import hashlib
 from .LoginUI import Ui_LoginForm
@@ -12,8 +11,6 @@ def encode_password(password):
 
 
 class LoginForm(QDialog):
-    _translate = QCoreApplication.translate
-
     def __init__(self, parent=None):
         super(LoginForm, self).__init__(parent)
         self.ui = Ui_LoginForm()
@@ -26,16 +23,13 @@ class LoginForm(QDialog):
         username = self.ui.username.text()
         password = self.ui.password.text()
         if not all([username, password]):
-            QMessageBox.critical(self, self._translate('LoginForm', '警告'),
-                                 self._translate('LoginForm', "用户名和密码不能为空"))
+            QMessageBox.critical(self, '警告', "用户名和密码不能为空")
             return
         if self.ui.username.text() == real_admin_username:
             if encode_password(self.ui.password.text()) == real_admin_password:
                 self.accept()
                 self.close()
             else:
-                QMessageBox.critical(self, self._translate('LoginForm', '警告'),
-                                     self._translate('LoginForm', '密码错误'))
+                QMessageBox.critical(self, '警告', '密码错误')
         else:
-            QMessageBox.critical(self, self._translate('LoginForm', '警告'),
-                                 self._translate('LoginForm', '用户名错误'))
+            QMessageBox.critical(self, '警告', '用户名错误')

@@ -6,3 +6,4 @@ venv
 */dist
 DEBUG
 BuildInfo.py
+config.db

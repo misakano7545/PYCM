@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtWidgets import QWidget, QFileDialog
-from PyQt5.QtCore import Qt, QCoreApplication, QDir
+from PyQt5.QtCore import Qt, QDir
 from PyQt5.QtGui import QPaintEvent, QCloseEvent
 from .ScreenBroadcastUI import Ui_ScreenBroadcastForm
 
@@ -10,7 +10,6 @@ class ScreenBroadcastForm(QWidget):
     parent = None
     freeze = False
     first_frame = True
-    _translate = QCoreApplication.translate
 
     def __init__(self, parent=None):
         super(ScreenBroadcastForm, self).__init__()
@@ -69,9 +68,7 @@ class ScreenBroadcastForm(QWidget):
         if frame is None or frame.isNull():
             return
         frame = frame.toImage()
-        file_path, _ = QFileDialog.getSaveFileName(self, self._translate('ScreenBroadcastForm', '选择保存路径'),
-                                                   str(QDir.homePath()),
-                                                   self._translate('ScreenBroadcastForm', 'JPEG 图像(*.jpg)'))
+        file_path, _ = QFileDialog.getSaveFileName(self, '选择保存路径', str(QDir.homePath()), 'JPEG 图像(*.jpg)')
         if file_path:
             frame.save(file_path, 'JPEG')
 

@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtCore import QSettings
+from Module.Database import Database
 
 
 class Config(object):
     def __init__(self):
         self.settings = QSettings('HCC', 'PYCMConsole')
+        self.db = Database()
         self.__default_config = {
             'FirstRun': True,
             'Network': {
@@ -58,7 +60,16 @@ class Config(object):
         self.init_all()
 
     def get_item(self, path, default=None):
-        return self.settings.value(str(path), default)
+        # 优先从数据库读取
+        value = self.db.get(str(path))
+        if value is not None:
+            return value
+        # 如果数据库中没有，尝试从 QSettings 读取（向后兼容）
+        value = self.settings.value(str(path), default)
+        # 如果 QSettings 中有值，迁移到数据库
+        if value is not None and value != default:
+            self.db.set(str(path), value)
+        return value
 
     def get_all(self, path, default=None):
         items = {}
@@ -69,6 +80,8 @@ class Config(object):
         return items
 
     def save(self, path, value, sync=True):
+        # 同时保存到数据库和 QSettings（向后兼容）
+        self.db.set(str(path), value)
         self.settings.setValue(str(path), value)
         if sync:
             self.settings.sync()
@@ -91,10 +104,21 @@ class Config(object):
             self.__generate_default_tree(value, path_list + [str(key)])
 
     def init_all(self):
-        if not self.first_run():
-            return False
-        self.__default_tree.clear()
-        self.__generate_default_tree(self.__default_config)
-        for key, value in self.__default_tree:
-            self.save(key, value)
-        self.settings.sync()
+        # 检查数据库是否已初始化
+        first_run = self.db.get('FirstRun')
+        if first_run is None:
+            # 首次运行，初始化默认配置到数据库
+            self.__default_tree.clear()
+            self.__generate_default_tree(self.__default_config)
+            for key, value in self.__default_tree:
+                self.db.set(key, value)
+            # 标记已初始化
+            self.db.set('FirstRun', False)
+        
+        # 保持 QSettings 的向后兼容性
+        if self.first_run():
+            self.__default_tree.clear()
+            self.__generate_default_tree(self.__default_config)
+            for key, value in self.__default_tree:
+                self.settings.setValue(key, value)
+            self.settings.sync()

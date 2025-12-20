@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>File Receive</string>
+   <string>文件接收</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../Resources/Resources.qrc">
@@ -35,7 +35,7 @@
      <item>
       <widget class="QLabel" name="receive_folder_label">
        <property name="text">
-        <string>Receive Folder: </string>
+        <string>接收文件夹: </string>
        </property>
       </widget>
      </item>
@@ -99,7 +99,7 @@
      </attribute>
      <column>
       <property name="text">
-       <string>File Name</string>
+       <string>文件名</string>
       </property>
       <property name="font">
        <font>

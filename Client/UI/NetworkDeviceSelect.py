@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtWidgets import QDialog, QMessageBox
-from PyQt5.QtCore import Qt, QCoreApplication
+from PyQt5.QtCore import Qt
 from PyQt5.QtNetwork import QNetworkInterface, QAbstractSocket
 import socket
 from .NetworkDeviceSelectUI import Ui_NetworkDeviceSelectDialog
 
 
 class NetworkDeviceSelectForm(QDialog):
-    _translate = QCoreApplication.translate
 
     def __init__(self, force=False):
         super(NetworkDeviceSelectForm, self).__init__()
@@ -55,7 +54,6 @@ class NetworkDeviceSelectForm(QDialog):
 
     def reject(self):
         if self.force:
-            QMessageBox.critical(self, self._translate('NetworkDeviceSelectDialog', '错误'),
-                                 self._translate('NetworkDeviceSelectDialog', '请选择一个网络设备'))
+            QMessageBox.critical(self, '错误', '请选择一个网络设备')
         else:
             super(NetworkDeviceSelectForm, self).reject()

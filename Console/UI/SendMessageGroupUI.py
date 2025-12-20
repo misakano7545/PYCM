@@ -53,7 +53,8 @@ class Ui_SendMessageGroupDialog(object):
         QtCore.QMetaObject.connectSlotsByName(SendMessageGroupDialog)
 
     def retranslateUi(self, SendMessageGroupDialog):
-        _translate = QtCore.QCoreApplication.translate
-        SendMessageGroupDialog.setWindowTitle(_translate("SendMessageGroupDialog", "消息"))
-        self.send_message_group.setTitle(_translate("SendMessageGroupDialog", "消息输入"))
+        SendMessageGroupDialog.setWindowTitle("消息")
+        self.send_message_group.setTitle("消息输入")
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText("确定")
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText("取消")
 from Resources import Resources

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>PYCM Dashboard</string>
+   <string>PYCM 控制台</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../Resources/Resources.qrc">
@@ -51,7 +51,7 @@ padding-bottom: 5px;
 </string>
       </property>
       <property name="text">
-       <string>Python Classroom Management System</string>
+       <string>Python 课堂管理系统</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -136,7 +136,7 @@ padding-bottom: 5px;
             </font>
            </property>
            <property name="text">
-            <string>Screen Broadcast</string>
+            <string>屏幕广播</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -166,7 +166,7 @@ padding-bottom: 5px;
             </font>
            </property>
            <property name="text">
-            <string>Remote View</string>
+            <string>远程查看</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -193,7 +193,7 @@ padding-bottom: 5px;
             </font>
            </property>
            <property name="text">
-            <string>Remote Command</string>
+            <string>远程命令</string>
            </property>
           </widget>
          </item>
@@ -217,7 +217,7 @@ padding-bottom: 5px;
             </font>
            </property>
            <property name="text">
-            <string>File Share</string>
+            <string>文件共享</string>
            </property>
           </widget>
          </item>
@@ -361,7 +361,7 @@ p, li { white-space: pre-wrap; }
                <item>
                 <widget class="QPushButton" name="file_receive_config">
                  <property name="text">
-                  <string>File Receive</string>
+                  <string>文件接收</string>
                  </property>
                 </widget>
                </item>
@@ -404,7 +404,7 @@ p, li { white-space: pre-wrap; }
                   </sizepolicy>
                  </property>
                  <property name="text">
-                  <string>Clear Log</string>
+                  <string>清除日志</string>
                  </property>
                 </widget>
                </item>
@@ -472,6 +472,7 @@ p, li { white-space: pre-wrap; }
    <addaction name="client_scroll_in"/>
    <addaction name="client_scroll_out"/>
    <addaction name="separator"/>
+   <addaction name="settings"/>
    <addaction name="about"/>
   </widget>
   <action name="client_sort">
@@ -481,27 +482,32 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="client_select_all">
    <property name="text">
-    <string>Select All</string>
+    <string>全选</string>
    </property>
   </action>
   <action name="client_scroll_in">
    <property name="text">
-    <string>Zoom In</string>
+    <string>放大</string>
    </property>
   </action>
   <action name="client_scroll_out">
    <property name="text">
-    <string>Zoom Out</string>
+    <string>缩小</string>
    </property>
   </action>
   <action name="client_rename">
    <property name="text">
-    <string>Rename</string>
+    <string>重命名</string>
+   </property>
+  </action>
+  <action name="settings">
+   <property name="text">
+    <string>设置</string>
    </property>
   </action>
   <action name="about">
    <property name="text">
-    <string>About</string>
+    <string>关于</string>
    </property>
   </action>
  </widget>
@@ -654,6 +660,22 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
+   <sender>settings</sender>
+   <signal>triggered()</signal>
+   <receiver>DashboardForm</receiver>
+   <slot>show_settings()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>651</x>
+     <y>389</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>about</sender>
    <signal>triggered()</signal>
    <receiver>DashboardForm</receiver>
@@ -759,6 +781,7 @@ p, li { white-space: pre-wrap; }
   <slot>remote_command()</slot>
   <slot>toggle_remote_spy(bool)</slot>
   <slot>client_rename()</slot>
+  <slot>show_settings()</slot>
   <slot>show_about()</slot>
   <slot>show_file_receive()</slot>
   <slot>client_quit()</slot>

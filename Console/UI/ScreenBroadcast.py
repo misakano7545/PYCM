@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtWidgets import QWidget, QSystemTrayIcon, QAction, QMenu
-from PyQt5.QtCore import Qt, QPoint, QCoreApplication
+from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QMouseEvent, QCloseEvent, QIcon, QShowEvent
 from .ScreenBroadcastUI import Ui_ScreenBroadcastForm
 
 
 class ScreenBroadcastForm(QWidget):
     parent = None
-    _translate = QCoreApplication.translate
     _start_pos = None
     _end_pos = None
     _is_tracking = False
@@ -44,14 +43,14 @@ class ScreenBroadcastForm(QWidget):
         """切换窗口广播和全屏广播"""
         if is_fullscreen:
             # 切换到全屏广播
-            self.ui.window_broadcast.setText(self._translate('ScreenBroadcastForm', '全屏广播'))
+            self.ui.window_broadcast.setText('全屏广播')
             # 通知客户端切换到全屏模式
             if self.parent and hasattr(self.parent, 'class_broadcast_object'):
                 # 发送 '2' 表示全屏模式
                 self.parent.class_broadcast_object.screen_broadcast_mode_notify(2)
         else:
             # 切换到窗口广播
-            self.ui.window_broadcast.setText(self._translate('ScreenBroadcastForm', '窗口广播'))
+            self.ui.window_broadcast.setText('窗口广播')
             # 通知客户端切换到窗口模式
             if self.parent and hasattr(self.parent, 'class_broadcast_object'):
                 # 发送 '1' 表示窗口模式
@@ -61,11 +60,11 @@ class ScreenBroadcastForm(QWidget):
         """初始化系统托盘图标"""
         self.tray_icon = QSystemTrayIcon(self)
         self.tray_icon.setIcon(QIcon(':/Core/Core/Logo.png'))
-        self.tray_icon.setToolTip(self._translate('ScreenBroadcastForm', '屏幕广播工具栏'))
+        self.tray_icon.setToolTip('屏幕广播工具栏')
         # 创建托盘图标菜单
         self.tray_menu = QMenu(self)
-        self.tray_menu.addAction(QAction(self._translate('ScreenBroadcastForm', '显示工具栏'), self, triggered=self.show_toolbar))
-        self.tray_menu.addAction(QAction(self._translate('ScreenBroadcastForm', '结束广播'), self, triggered=self.stop_broadcast))
+        self.tray_menu.addAction(QAction('显示工具栏', self, triggered=self.show_toolbar))
+        self.tray_menu.addAction(QAction('结束广播', self, triggered=self.stop_broadcast))
         self.tray_icon.setContextMenu(self.tray_menu)
         # 点击托盘图标时显示工具栏
         self.tray_icon.activated[QSystemTrayIcon.ActivationReason].connect(self._tray_icon_activated)

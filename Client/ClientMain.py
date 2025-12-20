@@ -2,7 +2,7 @@
 
 import PyQt5.sip
 from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox
-from PyQt5.QtCore import Qt, QCoreApplication
+from PyQt5.QtCore import Qt
 import sys
 import os
 import logging
@@ -32,14 +32,11 @@ logging.basicConfig(level=logging.DEBUG if os.path.isfile(debug_flag_path) else 
 
 class MainWindow(MainForm):
     config = config
-    _translate = QCoreApplication.translate
-
     def __init__(self):
         super(MainWindow, self).__init__(self)
         network_device = self.load_network_device()
         if not network_device:
-            QMessageBox.critical(self, self._translate('MainForm', '错误'),
-                                 self._translate('MainForm', '网络设备错误，请选择另一个设备！'))
+            QMessageBox.critical(self, '错误', '网络设备错误，请选择另一个设备！')
             device = config.force_get_network_device(only_name=False)
             config.save('Network/Local/Device', device['NAME'])
             self.init_network_device(device)

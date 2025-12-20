@@ -75,13 +75,12 @@ class Ui_LoginForm(object):
         QtCore.QMetaObject.connectSlotsByName(LoginForm)
 
     def retranslateUi(self, LoginForm):
-        _translate = QtCore.QCoreApplication.translate
-        LoginForm.setWindowTitle(_translate("LoginForm", "PYCM 登录"))
-        self.username.setPlaceholderText(_translate("LoginForm", "默认: admin"))
-        self.password.setPlaceholderText(_translate("LoginForm", "默认: 123456"))
-        self.title.setText(_translate("LoginForm", "PYCM 登录"))
-        self.label_username.setText(_translate("LoginForm", "用户名:"))
-        self.label_password.setText(_translate("LoginForm", "密码:"))
-        self.login_button.setText(_translate("LoginForm", "登录"))
-        self.login_button.setShortcut(_translate("LoginForm", "Return"))
+        LoginForm.setWindowTitle("PYCM 登录")
+        self.username.setPlaceholderText("默认: admin")
+        self.password.setPlaceholderText("默认: 123456")
+        self.title.setText("PYCM 登录")
+        self.label_username.setText("用户名:")
+        self.label_password.setText("密码:")
+        self.login_button.setText("登录")
+        self.login_button.setShortcut("Return")
 from Resources import Resources

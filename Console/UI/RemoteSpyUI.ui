@@ -20,7 +20,7 @@
    <bool>true</bool>
   </property>
   <property name="windowTitle">
-   <string>Remote View</string>
+   <string>远程查看</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../Resources/Resources.qrc">

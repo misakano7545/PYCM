@@ -90,10 +90,9 @@ class Ui_ScreenBroadcastForm(object):
         QtCore.QMetaObject.connectSlotsByName(ScreenBroadcastForm)
 
     def retranslateUi(self, ScreenBroadcastForm):
-        _translate = QtCore.QCoreApplication.translate
-        ScreenBroadcastForm.setWindowTitle(_translate("ScreenBroadcastForm", "屏幕广播"))
-        self.title_label.setText(_translate("ScreenBroadcastForm", "PYCM 控制台 - 屏幕广播"))
-        self.window_broadcast.setText(_translate("ScreenBroadcastForm", "窗口广播"))
-        self.hide_toolbar.setText(_translate("ScreenBroadcastForm", "隐藏工具栏"))
-        self.stop_broadcast.setText(_translate("ScreenBroadcastForm", "结束广播"))
+        ScreenBroadcastForm.setWindowTitle("屏幕广播")
+        self.title_label.setText("PYCM 控制台 - 屏幕广播")
+        self.window_broadcast.setText("窗口广播")
+        self.hide_toolbar.setText("隐藏工具栏")
+        self.stop_broadcast.setText("结束广播")
 from Resources import Resources

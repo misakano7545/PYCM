@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtCore import Qt, QCoreApplication
+from PyQt5.QtCore import Qt
 import socket
 from .SendMessageUI import Ui_SendMessageForm
 
 
 class SendMessageForm(QWidget):
-    _translate = QCoreApplication.translate
-
     def __init__(self, parent=None):
         super(SendMessageForm, self).__init__()
         self.parent = parent
@@ -17,9 +15,9 @@ class SendMessageForm(QWidget):
 
     def add_message(self, is_receive, message):
         if is_receive:
-            direction = self._translate('SendMessageForm', '收到')
+            direction = '收到'
         else:
-            direction = self._translate('SendMessageForm', '发送')
+            direction = '发送'
         self.ui.message_area.append('%s: %s' % (direction, message))
 
     def send_message(self):

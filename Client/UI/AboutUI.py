@@ -76,8 +76,8 @@ class Ui_AboutDialog(object):
         QtCore.QMetaObject.connectSlotsByName(AboutDialog)
 
     def retranslateUi(self, AboutDialog):
-        _translate = QtCore.QCoreApplication.translate
-        AboutDialog.setWindowTitle(_translate("AboutDialog", "关于"))
-        self.product_name.setText(_translate("AboutDialog", "PYCM 客户端"))
-        self.buildInfo.setText(_translate("AboutDialog", "无构建信息"))
+        AboutDialog.setWindowTitle("关于")
+        self.product_name.setText("PYCM 客户端")
+        self.buildInfo.setText("无构建信息")
+        self.operation_buttons.button(QtWidgets.QDialogButtonBox.Ok).setText("确定")
 from Resources import Resources

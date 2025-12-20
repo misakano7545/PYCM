@@ -59,7 +59,6 @@ class Ui_SendMessageForm(object):
         QtCore.QMetaObject.connectSlotsByName(SendMessageForm)
 
     def retranslateUi(self, SendMessageForm):
-        _translate = QtCore.QCoreApplication.translate
-        SendMessageForm.setWindowTitle(_translate("SendMessageForm", "消息"))
-        self.send.setText(_translate("SendMessageForm", "发送"))
+        SendMessageForm.setWindowTitle("消息")
+        self.send.setText("发送")
 from Resources import Resources

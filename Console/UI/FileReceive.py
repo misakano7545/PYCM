@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtWidgets import QDialog, QHeaderView, QTableWidgetItem, QLabel, QFileDialog
-from PyQt5.QtCore import Qt, QUrl, QCoreApplication
+from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtGui import QDesktopServices
 import os
 from .FileReceiveUI import Ui_FileReceiveDialog
 
 
 class FileReceiveForm(QDialog):
-    _translate = QCoreApplication.translate
-
     def __init__(self, parent=None):
         super(FileReceiveForm, self).__init__(parent)
         self.ui = Ui_FileReceiveDialog()
@@ -37,8 +35,7 @@ class FileReceiveForm(QDialog):
         self.ui.received_files.setItem(current_row, 1, label)
 
     def change_receive_folder(self):
-        directory = QFileDialog.getExistingDirectory(self, self._translate('FileReceiveDialog', '选择接收文件夹'),
-                                                     os.path.expanduser('~'))
+        directory = QFileDialog.getExistingDirectory(self, '选择接收文件夹', os.path.expanduser('~'))
         if not directory:
             return
         self.parent.config.save('Client/FileUploadPath', directory)
