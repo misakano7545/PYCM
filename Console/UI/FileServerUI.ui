@@ -64,7 +64,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Change</string>
+        <string>更改</string>
        </property>
       </widget>
      </item>
@@ -88,7 +88,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Start</string>
+        <string>启动</string>
        </property>
       </widget>
      </item>

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'Console\UI\FileServerUI.ui'
+# Form implementation generated from reading ui file 'FileServerUI.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.11
 #
@@ -74,7 +74,7 @@ class Ui_FileServerForm(object):
         _translate = QtCore.QCoreApplication.translate
         FileServerForm.setWindowTitle(_translate("FileServerForm", "文件服务器"))
         self.working_folder_label.setText(_translate("FileServerForm", "目标文件夹: "))
-        self.working_folder_change.setText(_translate("FileServerForm", "Change"))
+        self.working_folder_change.setText(_translate("FileServerForm", "更改"))
         self.server_info.setText(_translate("FileServerForm", "服务器状态: 已停止"))
-        self.toggle_working.setText(_translate("FileServerForm", "Start"))
-from Resources import Resources
+        self.toggle_working.setText(_translate("FileServerForm", "启动"))
+import Resources_rc

@@ -29,11 +29,37 @@ class ScreenBroadcast(QObject):
         self.socket_obj.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket_obj.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, self.socket_buffer)
         self.socket_obj.bind(('', self.socket_port))
-        self.socket_obj.setsockopt(
-            socket.IPPROTO_IP,
-            socket.IP_ADD_MEMBERSHIP,
-            socket.inet_aton(self.socket_ip) + socket.inet_aton(self.current_ip)
-        )
+        
+        # 验证并处理 current_ip
+        local_ip = None
+        if self.current_ip:
+            try:
+                # 验证 current_ip 是否为有效的 IP 地址
+                socket.inet_aton(self.current_ip)
+                local_ip = self.current_ip
+            except (OSError, socket.error):
+                # current_ip 无效，使用 INADDR_ANY
+                local_ip = None
+        
+        # 构建多播组加入请求
+        try:
+            if local_ip:
+                # 使用指定的本地 IP 地址
+                mreq = socket.inet_aton(self.socket_ip) + socket.inet_aton(local_ip)
+            else:
+                # 使用 INADDR_ANY (0.0.0.0)，让系统自动选择接口
+                mreq = struct.pack('4sL', socket.inet_aton(self.socket_ip), socket.INADDR_ANY)
+            
+            self.socket_obj.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+        except OSError as e:
+            logging.error(f'Failed to join multicast group {self.socket_ip} with local IP {local_ip}: {e}')
+            # 如果加入多播组失败，尝试使用 INADDR_ANY
+            try:
+                mreq = struct.pack('4sL', socket.inet_aton(self.socket_ip), socket.INADDR_ANY)
+                self.socket_obj.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+            except OSError as e2:
+                logging.error(f'Failed to join multicast group with INADDR_ANY: {e2}')
+                raise
 
     def __receive_thread(self):
         header_size = struct.calcsize('!4i')
